@@ -153,6 +153,31 @@
             </script>
         </div>
     </main>
+<div class="terminal-container">
+    <form id="guestbook-form">
+        <input type="text" name="nickname" placeholder="Аноним" maxlength="15" required>
+        <textarea name="message" placeholder="Введите сообщение..." maxlength="200" required></textarea>
+        <button type="submit">ОТПРАВИТЬ ПАКЕТ</button>
+    </form>
+</div>
 
+<div id="messages-display">
+    <!-- Сюда скрипт будет подтягивать сообщения -->
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwobw-qJ929lw309XkX9ntipq5dmDfSsA3ryEBOQ4TsYiscmj83eAq9jq_hlse_NGZLxg/exec";
+
+    document.getElementById('guestbook-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: new FormData(this)
+        }).then(() => {
+            alert('Сообщение отправлено в сеть!');
+            this.reset();
+        });
+    });
+</script>
 </body>
 </html>
