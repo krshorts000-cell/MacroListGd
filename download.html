@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacroList | Скачать xdBot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg-color: #050505;
+            --surface-color: rgba(18, 18, 18, 0.65);
+            --text-main: #f5f5f7;
+            --text-muted: #9999a3;
+            --neon-cyan: #00f0ff;
+            --neon-purple: #8a2be2;
+            --border-color: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: text-shadow 0.3s ease;
+        }
+
+        .logo:hover { text-shadow: 0 0 15px var(--neon-purple); }
+
+        .nav-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-main);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .download-header {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .download-title h1 {
+            font-size: 36px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .download-title h1 span {
+            color: #fff;
+            text-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .download-title p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* Неоновый контейнер релиза */
+        .download-container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-bottom: 2px solid rgba(0, 240, 255, 0.4);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 
+                        0 0 30px rgba(0, 240, 255, 0.1);
+            text-align: center;
+        }
+
+        .version-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            color: var(--neon-cyan);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Жирная неоновая кнопка скачивания */
+        .btn-main-download {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: rgba(0, 240, 255, 0.05);
+            color: #fff;
+            text-decoration: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 18px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-bottom: 3px solid var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .btn-main-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+            border-color: var(--neon-cyan);
+            background: rgba(0, 240, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">MacroList</a>
+        <div class="nav-actions">
+            <a href="index.html" class="nav-link">Каталог</a>
+            <a href="forum.html" class="nav-link">Обсуждение</a>
+            <a href="download.html" class="nav-link active">Скачать xdBot</a>
+            <a href="submit.html" class="nav-link" style="border: 1px solid var(--neon-purple); padding: 5px 15px; border-radius: 6px;">Предложить макрос</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="download-header">
+            <div class="download-title">
+                <h1>Установка <span>xdBot</span></h1>
+                <p>Официальный движок для воспроизведения и записи макросов в Geometry Dash.</p>
+            </div>
+        </div>
+
+        <div class="download-container">
+            <span class="version-tag">Стабильная сборка</span>
+            <h2>xdBot v1.4.2</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Совместимость игры</div>
+                    <div class="info-value" style="color: #4caf50;">GD 2.208 (Steam)</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Тип мода</div>
+                    <div class="info-value">Geode / standalone</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Размер файла</div>
+                    <div class="info-value">14.6 MB</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Платформа</div>
+                    <div class="info-value">Windows (x64)</div>
+                </div>
+            </div>
+
+            <!-- В href вставь прямую ссылку на скачивание файла -->
+            <a href="ССЫЛКА_НА_ФАЙЛ" class="btn-main-download">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Скачать xdBot .zip
+            </a>
+        </div>
+    </main>
+
+</body>
+</html>
