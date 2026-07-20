@@ -56,7 +56,7 @@
             document.getElementById('tab-' + tab).style.display = 'block';
             btn.classList.add('active');
         }
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwobw-qJ929lw309XkX9ntipq5dmDfSsA3ryEBOQ4TsYiscmj83eAq9jq_hlse_NGZLxg/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLH51FgbnKygtvU6U3gKcepGvHXrV1QimDWGQ-3Sj3WXCPV2EUy0gxfNeZLuK3Q83e2g/exec";
         const form = document.getElementById('guestbook-form');
         const statusLog = document.getElementById('status-log');
         const submitBtn = document.getElementById('submit-btn');
@@ -65,13 +65,21 @@
             e.preventDefault();
             submitBtn.disabled = true;
             statusLog.innerText = "STATUS: SENDING_PACKET...";
-            fetch(SCRIPT_URL, { method: 'POST', body: new FormData(this) })
-            .then(() => {
-                statusLog.innerText = "STATUS: PACKET_SENT_SUCCESSFULLY";
-                form.reset();
-                setTimeout(() => { statusLog.innerText = "STATUS: READY_TO_SEND"; submitBtn.disabled = false; }, 3000);
-            }).catch(() => { statusLog.innerText = "STATUS: ERROR_CONNECTION_FAILED"; submitBtn.disabled = false; });
-        });
+            fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors', // Это критично
+    body: new FormData(form)
+})
+.then(() => {
+    statusLog.innerText = "STATUS: PACKET_SENT_SUCCESSFULLY";
+    form.reset();
+    setTimeout(() => { statusLog.innerText = "STATUS: READY_TO_SEND"; submitBtn.disabled = false; }, 3000);
+})
+.catch((err) => {
+    console.error(err);
+    statusLog.innerText = "STATUS: ERROR_CONNECTION_FAILED";
+    submitBtn.disabled = false;
+});
     </script>
 </body>
 </html>
