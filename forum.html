@@ -9,11 +9,12 @@
 
         :root {
             --bg-color: #050505;
-            --surface-color: #121212;
-            --text-main: #f0f0f0;
-            --text-muted: #888888;
+            --surface-color: rgba(18, 18, 18, 0.65);
+            --text-main: #f5f5f7;
+            --text-muted: #9999a3;
             --neon-primary: #8a2be2;
-            --border-color: rgba(255, 255, 255, 0.05);
+            --neon-glow: rgba(138, 43, 226, 0.35);
+            --border-color: rgba(255, 255, 255, 0.03);
         }
 
         * {
@@ -36,7 +37,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 40px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             background: rgba(18, 18, 18, 0.7);
             backdrop-filter: blur(10px);
             position: sticky;
@@ -90,6 +91,13 @@
             font-size: 36px;
             font-weight: 300;
             margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Фиолетовая неоновая подсветка заголовка */
+        .forum-title h1 span {
+            color: #fff;
+            text-shadow: 0 0 15px var(--neon-primary);
         }
 
         .forum-title p {
@@ -97,17 +105,22 @@
             font-size: 15px;
         }
 
-        /* Контейнер для виджета Telegram */
+        /* Прокачанный неоновый контейнер в стиле Glassmorphism */
         .tg-comments-container {
             width: 100%;
             max-width: 800px;
             background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            min-height: 400px; /* Чтобы блок не прыгал при загрузке скрипта */
+            border-bottom: 2px solid rgba(138, 43, 226, 0.4); /* Неоновая лазерная линия снизу */
+            border-radius: 16px;
+            padding: 25px;
+            min-height: 400px;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 
+                        0 0 30px rgba(138, 43, 226, 0.15);
         }
     </style>
 </head>
@@ -125,24 +138,19 @@
     <main>
         <div class="forum-header-section">
             <div class="forum-title">
-                <h1>Live Обсуждение</h1>
+                <h1>Live <span>Обсуждение</span></h1>
                 <p>Авторизуйся через Telegram, чтобы оставить комментарий. Все сообщения синхронизируются с нашим каналом.</p>
             </div>
         </div>
 
         <div class="tg-comments-container">
-            <!-- ============================================== -->
-            <!-- ВОТ СЮДА НУЖНО ВСТАВИТЬ СКРИПТ ОТ ТЕЛЕГРАМА    -->
-            <!-- ============================================== -->
-            
-            <script async src="https://t.me/macrolist1" 
-                    data-telegram-discussion="durov/43" 
+            <!-- Родной адрес скрипта восстановлен, а твой канал привязан ниже -->
+            <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                    data-telegram-discussion="macrolist1/1" 
                     data-comments-limit="10" 
                     data-color="8a2be2" 
                     data-dark="1">
             </script>
-
-            <!-- ============================================== -->
         </div>
     </main>
 
