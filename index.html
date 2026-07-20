@@ -208,27 +208,146 @@
             <input type="text" placeholder="Введите название уровня или автора...">
         </div>
 
-       <div class="categories">
-            <!-- Первая карточка: Каталог -->
-            <a href="catalog.html" class="card">
-                <div class="macro-info">
-                    <div class="macro-title">Каталог макросов</div>
-                    <div class="macro-details">
-                        Полная база TAS и макросов для прохождения уровней, отсортированная по сложности.
-                    </div>
-                </div>
-            </a>
+<!-- Скопируй этот блок стилей и вставь его в раздел <style> твоего index.html -->
+<style>
+    :root {
+        --bg-color: #050505;
+        --card-bg: rgba(18, 18, 18, 0.65);
+        --neon-purple: #8a2be2;
+        --neon-cyan: #00f0ff;
+        --text-main: #f5f5f7;
+        --text-muted: #9999a3;
+        --border-glow: rgba(138, 43, 226, 0.15);
+    }
 
-            <!-- Вторая карточка: Форум -->
-            <a href="forum.html" class="card">
-                <div class="macro-info">
-                    <div class="macro-title">Форум сообщества</div>
-                    <div class="macro-details">
-                        Живое общение, обсуждение макросов и помощь по настройке ботов.
-                    </div>
-                </div>
-            </a>
+    /* Контейнер для двух кнопок */
+    .categories {
+        display: flex;
+        gap: 30px;
+        max-width: 900px;
+        width: 100%;
+        margin: 40px auto;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    /* Общий стиль для неоновых карточек-кнопок */
+    .card {
+        flex: 1;
+        text-decoration: none;
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 
+                    inset 0 0 20px 0 var(--border-glow);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Псевдоэлемент для создания эффекта лазерного неонового свечения сбоку */
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, transparent, rgba(138, 43, 226, 0.05), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+
+    .card:hover::before {
+        transform: translateX(100%);
+    }
+
+    /* Специфичные неоновые рамки для каждой кнопки */
+    .card.catalog-btn {
+        border-bottom: 2px solid rgba(0, 240, 255, 0.4);
+    }
+
+    .card.forum-btn {
+        border-bottom: 2px solid rgba(138, 43, 226, 0.4);
+    }
+
+    /* Анимация при наведении */
+    .card.catalog-btn:hover {
+        transform: translateY(-5px);
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.25),
+                    inset 0 0 15px rgba(0, 240, 255, 0.1);
+    }
+
+    .card.forum-btn:hover {
+        transform: translateY(-5px);
+        border-color: var(--neon-purple);
+        box-shadow: 0 0 30px rgba(138, 43, 226, 0.35),
+                    inset 0 0 15px rgba(138, 43, 226, 0.15);
+    }
+
+    /* Текст внутри карточек */
+    .macro-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 12px;
+        letter-spacing: 0.5px;
+        transition: text-shadow 0.3s ease;
+    }
+
+    /* Подсветка текста при наведении */
+    .card.catalog-btn:hover .macro-title {
+        text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+    }
+
+    .card.forum-btn:hover .macro-title {
+        text-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
+    }
+
+    .macro-details {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    /* Адаптивность для телефонов */
+    @media (max-width: 768px) {
+        .categories {
+            flex-direction: column;
+            gap: 20px;
+        }
+    }
+</style>
+
+<!-- А этот блок вставь в тег <main> вместо старого <div class="categories"> -->
+<div class="categories">
+    <!-- Кнопка 1: Каталог макросов (Голубой неон) -->
+    <a href="catalog.html" class="card catalog-btn">
+        <div class="macro-info">
+            <div class="macro-title">Каталог макросов</div>
+            <div class="macro-details">
+                Полная база проверенных TAS и макросов, отсортированная по сложности и актуальным версиям игры.
+            </div>
         </div>
+    </a>
+
+    <!-- Кнопка 2: Форум сообщества (Фиолетовый неон) -->
+    <a href="forum.html" class="card forum-btn">
+        <div class="macro-info">
+            <div class="macro-title">Форум сообщества</div>
+            <div class="macro-details">
+                Живое общение с игроками, обсуждение механик, помощь по настройке ботов и трекер обновлений.
+            </div>
+        </div>
+    </a>
+</div>
     </main>
 
 </body>
