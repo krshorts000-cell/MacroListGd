@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить макрос — Macrolist</title>
+    
+    <style>
+        /* Темная тема, идеально вписывается в дизайн сайта */
+        :root {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --accent-color: #7b61ff; /* Акцентный цвет (можно заменить) */
+            --accent-hover: #9783ff;
+            --border-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Шапка с возвратом на главную */
+        header {
+            background-color: var(--container-bg);
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        header a:hover {
+            color: var(--accent-hover);
+        }
+
+        /* Основной блок по центру экрана */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .icon-box {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        p.description {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        /* Стилизованная кнопка-портал */
+        .google-form-btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(123, 97, 255, 0.3);
+        }
+
+        .google-form-btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(123, 97, 255, 0.5);
+        }
+        
+        .google-form-btn:active {
+            transform: translateY(0);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html">← Вернуться к списку уровней</a>
+    </header>
+
+    <main class="main-container">
+        
+        <div class="icon-box">🚀</div>
+        <h1>Предложить свой макрос</h1>
+        
+        <p class="description">
+            Чтобы добавить макрос в базу Macrolist, необходимо заполнить форму и прикрепить исходный файл. 
+            Мы используем Google Формы для безопасной загрузки файлов xdBot и других ботов.
+        </p>
+
+        <!-- Ссылка на твою Гугл Форму. 
+             target="_blank" открывает её в новой вкладке, чтобы сайт не закрывался -->
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSck-q0EdjAkW65isqMeJOB4M8p6RAETTwwsRsftUZHTeENsmw/viewform" 
+           class="google-form-btn" 
+           target="_blank" 
+           rel="noopener noreferrer">
+           Перейти к загрузке файла
+        </a>
+
+    </main>
+
+</body>
+</html>

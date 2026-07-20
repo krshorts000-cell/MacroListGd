@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacroList | База макросов Geometry Dash</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-color: #050505;
+            --surface-color: #121212;
+            --text-main: #f0f0f0;
+            --text-muted: #888888;
+            --neon-primary: #8a2be2; /* Фиолетовый неон в стиле Gemini */
+            --neon-danger: #ff2a2a; /* Красный оттенок в стиле Demonlist */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Навигация (Шапка) */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: text-shadow 0.3s ease;
+        }
+
+        .logo:hover {
+            text-shadow: 0 0 15px var(--neon-primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .tg-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .tg-link:hover {
+            color: #0088cc;
+            text-shadow: 0 0 10px rgba(0, 136, 204, 0.5);
+        }
+
+        .btn-submit {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--neon-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: var(--neon-primary);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+            color: #fff;
+        }
+
+        /* Главный экран */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        /* Кликбейтный баннер */
+        .news-badge {
+            background: rgba(255, 42, 42, 0.1);
+            border: 1px solid rgba(255, 42, 42, 0.3);
+            color: var(--neon-danger);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 10px rgba(255, 42, 42, 0.2);
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 40px;
+        }
+
+        /* Поисковая строка а-ля Gemini */
+        .search-bar {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+            margin-bottom: 60px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 25px;
+            border-radius: 30px;
+            font-size: 16px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--neon-primary);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+        }
+
+        /* Блок с карточками-ссылками */
+        .categories {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 30px;
+            flex: 1;
+            min-width: 250px;
+            text-decoration: none;
+            color: var(--text-main);
+            text-align: left;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-primary);
+            box-shadow: 0 5px 20px rgba(138, 43, 226, 0.15);
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-weight: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">MacroList</div>
+        <div class="nav-actions">
+            <a href="https://t.me/MacroList" target="_blank" class="tg-link">Telegram</a>
+            <a href="submit.html" class="btn-submit">Предложить макрос</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="news-badge">🔥 XDBot Доступен В Geometry Dash 2.208</div>
+        
+        <h1>Поиск макросов</h1>
+        
+        <div class="search-bar">
+            <input type="text" placeholder="Введите название уровня или автора...">
+        </div>
+
+        <div class="categories">
+            <!-- Ссылка теперь ведет на файл catalog.html -->
+            <a href="catalog.html" class="card">
+                <h2>Каталог макросов</h2>
+                <p>Полная база TAS и макросов для прохождения уровней, отсортированная по сложности.</p>
+            </a>
+            <!-- Если в будущем сделаешь отдельную страницу для xdBot, поменяй href и здесь (например, на xdbot.html) -->
+            <a href="#xd-macros" class="card">
+                <h2>xdBot Файлы</h2>
+                <p>Специальный раздел с макросами, адаптированными под движок xdBot.</p>
+            </a>
+        </div>
+    </main>
+
+</body>
+</html>

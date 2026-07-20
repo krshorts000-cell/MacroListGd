@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacroList | База макросов</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-color: #050505;
+            --surface-color: #121212;
+            --text-main: #f0f0f0;
+            --text-muted: #888888;
+            --neon-primary: #8a2be2;
+            --neon-danger: #ff2a2a;
+            --neon-cyan: #00ffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: text-shadow 0.3s ease;
+            color: var(--text-main);
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            text-shadow: 0 0 15px var(--neon-primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .tg-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .tg-link:hover {
+            color: #0088cc;
+            text-shadow: 0 0 10px rgba(0, 136, 204, 0.5);
+        }
+
+        .btn-submit {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--neon-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: var(--neon-primary);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+            color: #fff;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 40px;
+            font-weight: 300;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 25px;
+            border-radius: 12px;
+            font-size: 16px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--neon-primary);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+        }
+
+        .catalog {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .macro-card {
+            background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .macro-card:hover {
+            transform: scale(1.01);
+            border-color: var(--neon-primary);
+        }
+
+        .macro-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .macro-preview {
+            width: 120px;
+            height: 68px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #000;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .macro-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .macro-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .macro-details {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .macro-details span {
+            color: var(--text-main);
+            margin-right: 15px;
+        }
+
+        .btn-download {
+            background: #2a2a2a;
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-download:hover {
+            background: var(--neon-primary);
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+        }
+
+        /* 
+         * ==========================================
+         * СТИЛИ ДЛЯ МОДАЛЬНОГО ОКНА (ПЛАШКИ)
+         * ==========================================
+         */
+        .modal-overlay {
+            display: none; /* Скрыто по умолчанию */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* Затемнение фона */
+            backdrop-filter: blur(8px);
+            z-index: 1000; /* Поверх всего сайта */
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            width: 60%; /* Плашка занимает 60% экрана */
+            max-width: 1000px;
+            min-width: 320px;
+            background: var(--surface-color);
+            border: 1px solid var(--neon-primary);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-video-container {
+            width: 100%;
+            aspect-ratio: 16 / 9; /* Пропорции YouTube */
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .modal-video-container iframe,
+        .modal-video-container img {
+            width: 100%;
+            height: 100%;
+            border: none;
+            object-fit: cover;
+        }
+
+        .modal-title-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-title-text {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .modal-desc {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 900px) {
+            .modal-content { width: 85%; }
+        }
+
+        @media (max-width: 600px) {
+            .macro-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .macro-preview {
+                width: 100%;
+                height: 180px;
+            }
+            .macro-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            .btn-download {
+                text-align: center;
+            }
+            .modal-content { width: 95%; padding: 15px; }
+            .modal-title-text { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">MacroList</a>
+        <div class="nav-actions">
+            <a href="https://t.me/MacroList" target="_blank" class="tg-link">Telegram-канал</a>
+            <a href="submit.html" class="btn-submit">Предложить макрос</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Каталог Макросов</h1>
+        
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Поиск по названию уровня или автору...">
+        </div>
+
+        <div class="catalog" id="catalogContainer"></div>
+    </main>
+
+    <!-- СКРЫТЫЙ БЛОК МОДАЛЬНОГО ОКНА -->
+    <div class="modal-overlay" id="macroModal">
+        <div class="modal-content" id="modalInner">
+            <!-- Сюда JS будет подставлять видео и текст при клике -->
+        </div>
+    </div>
+
+    <script>
+        const macrosBase = [
+            {
+                "level": "challange level", 
+                "author": "zynex", 
+                "bot": "xdBot", 
+                "fps": "240", 
+                "link": "https://drive.google.com/open?id=12F-5zew07X06rNzJnBggBU-iYZZoet9k", 
+                "showcase": "https://www.youtube.com/watch?v=bHs4SWpaweQ&t=31s", 
+                "description": "Невозможный уровень с 15 кпс геймплеем в стиле найн серклз. Скачай файл и перенеси в папку с ботом.", 
+                "image": "https://placeholder.co/240x136/121212/bbbbbb"
+            }
+        ];
+
+        const container = document.getElementById('catalogContainer');
+        const searchInput = document.getElementById('searchInput');
+        const modal = document.getElementById('macroModal');
+        const modalInner = document.getElementById('modalInner');
+
+        // Парсер ссылок YouTube
+        function getYouTubeEmbedUrl(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            if (match && match[2].length === 11) {
+                return `https://www.youtube.com/embed/${match[2]}?autoplay=1`; // Добавлен autoplay, чтобы видео стартовало само
+            }
+            return null;
+        }
+
+        // Рендер каталога
+        function renderCatalog(macros) {
+            container.innerHTML = ''; 
+            
+            if(macros.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Ничего не найдено</p>';
+                return;
+            }
+
+            macros.forEach((macro, index) => {
+                const card = document.createElement('div');
+                card.className = 'macro-card';
+
+                card.innerHTML = `
+                    <div class="macro-content">
+                        <div style="font-size: 24px; font-weight: 600; color: var(--text-muted); width: 40px; text-align: center;">#${index + 1}</div>
+                        <!-- В списке теперь только легкая картинка, чтобы сайт не лагал -->
+                        <img src="${macro.image}" alt="Уровень ${macro.level}" class="macro-preview">
+                        <div class="macro-info">
+                            <div class="macro-title">${macro.level}</div>
+                            <div class="macro-details">
+                                Автор: <span>${macro.author}</span>
+                                Бот: <span>${macro.bot}</span>
+                                FPS: <span>${macro.fps}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="${macro.link}" class="btn-download" target="_blank" onclick="event.stopPropagation()">Скачать</a>
+                `;
+
+                // При клике на карточку открываем плашку
+                card.addEventListener('click', () => openModal(macro));
+                container.appendChild(card);
+            });
+        }
+
+        // Функция открытия плашки
+        function openModal(macro) {
+            const embedUrl = getYouTubeEmbedUrl(macro.showcase);
+            
+            // Если есть видео - грузим плеер, если нет - показываем картинку
+            const mediaHtml = embedUrl 
+                ? `<iframe src="${embedUrl}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
+                : `<img src="${macro.image}" alt="${macro.level}">`;
+
+            const descText = macro.description || "Описание отсутствует.";
+
+            // Заполняем модальное окно данными
+            modalInner.innerHTML = `
+                <div class="modal-video-container">
+                    ${mediaHtml}
+                </div>
+                <div class="modal-title-wrap">
+                    <div class="modal-title-text">${macro.level}</div>
+                    <a href="${macro.link}" class="btn-download" target="_blank">Скачать</a>
+                </div>
+                <div class="modal-desc">${descText}</div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        // Закрытие плашки при клике в ЛЮБОЕ место окна
+        modal.addEventListener('click', function(e) {
+            // Убираем класс active (окно плавно исчезает)
+            this.classList.remove('active');
+            
+            // Сбрасываем внутренности через 300мс (когда закончится анимация исчезновения),
+            // чтобы видео на YouTube перестало играть в фоне!
+            setTimeout(() => {
+                modalInner.innerHTML = '';
+            }, 300);
+        });
+
+        // Блокируем закрытие плашки, если кликнули на кнопку "Скачать" внутри самой плашки
+        modalInner.addEventListener('click', function(e) {
+            if(e.target.classList.contains('btn-download')) {
+                e.stopPropagation();
+            }
+        });
+
+        renderCatalog(macrosBase);
+
+        // Поиск
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = macrosBase.filter(macro => 
+                macro.level.toLowerCase().includes(query) || 
+                macro.author.toLowerCase().includes(query)
+            );
+            renderCatalog(filtered);
+        });
+    </script>
+</body>
+</html>
