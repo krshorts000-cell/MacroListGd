@@ -343,6 +343,7 @@
     </div>
 
     <script>
+        
         const macrosBase = [
             {
                 "level": "challange level", 
@@ -464,6 +465,50 @@
             );
             renderCatalog(filtered);
         });
+        const grid = document.getElementById('levels-wrapper');
+    const sortBtn = document.getElementById('sort-btn');
+
+    // Функция рендера (рисует то, что есть в массиве)
+    function render(data) {
+        grid.innerHTML = '';
+        data.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'level-card'; 
+            card.innerHTML = `
+                <div class="level-info-block">
+                    <div class="level-header">
+                        <div>
+                            <div class="level-name">${m.level}</div>
+                            <div class="level-author">by ${m.author}</div>
+                        </div>
+                    </div>
+                    <div class="level-meta">
+                        <div class="meta-line"><span>Bot:</span> <span>${m.bot}</span></div>
+                        <div class="meta-line"><span>FPS:</span> <span>${m.fps}</span></div>
+                    </div>
+                </div>
+                <a href="${m.link}" class="btn-download-macro">Скачать макрос</a>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // Логика сортировки по алфавиту
+    let isSorted = false;
+    sortBtn.addEventListener('click', () => {
+        if (!isSorted) {
+            macrosBase.sort((a, b) => a.level.localeCompare(b.level));
+            sortBtn.innerText = "Сбросить сортировку";
+        } else {
+            // Можно добавить тут логику сброса в исходный порядок, 
+            // если сохранишь копию оригинального массива
+            location.reload(); // Самый простой и безопасный способ сбросить
+        }
+        render(macrosBase);
+        isSorted = !isSorted;
+    });
+
+    render(macrosBase);
     </script>
 </body>
 </html>
