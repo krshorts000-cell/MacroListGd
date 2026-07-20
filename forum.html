@@ -5,179 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacroList | Обсуждение</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
-        :root {
-            --bg-color: #050505;
-            --surface-color: rgba(18, 18, 18, 0.65);
-            --text-main: #f5f5f7;
-            --text-muted: #9999a3;
-            --neon-primary: #8a2be2;
-            --neon-glow: rgba(138, 43, 226, 0.35);
-            --border-color: rgba(255, 255, 255, 0.03);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(18, 18, 18, 0.7);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 600;
-            text-transform: uppercase;
-            text-decoration: none;
-            color: var(--text-main);
-            transition: text-shadow 0.3s ease;
-        }
-
-        .logo:hover { text-shadow: 0 0 15px var(--neon-primary); }
-
-        .nav-actions {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: var(--text-main);
-        }
-
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-        }
-
-        .forum-header-section {
-            width: 100%;
-            max-width: 800px;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .forum-title h1 {
-            font-size: 36px;
-            font-weight: 300;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
-        }
-        
-        /* Фиолетовая неоновая подсветка заголовка */
-        .forum-title h1 span {
-            color: #fff;
-            text-shadow: 0 0 15px var(--neon-primary);
-        }
-
-        .forum-title p {
-            color: var(--text-muted);
-            font-size: 15px;
-        }
-
-        /* Прокачанный неоновый контейнер в стиле Glassmorphism */
-        .tg-comments-container {
-            width: 100%;
-            max-width: 800px;
-            background: var(--surface-color);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-bottom: 2px solid rgba(138, 43, 226, 0.4); /* Неоновая лазерная линия снизу */
-            border-radius: 16px;
-            padding: 25px;
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 
-                        0 0 30px rgba(138, 43, 226, 0.15);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Share+Tech+Mono&display=swap');
+        :root { --bg-color: #050505; --surface-color: rgba(18, 18, 18, 0.65); --neon-primary: #8a2be2; --neon-terminal: #00f0ff; }
+        body { background: var(--bg-color); color: #f5f5f7; margin: 0; font-family: 'Inter', sans-serif; }
+        header { padding: 20px 40px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: 600; text-transform: uppercase; text-decoration: none; color: #fff; }
+        .nav-actions { display: flex; gap: 20px; }
+        .nav-link { color: #999; text-decoration: none; }
+        main { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+        .toggle-container { display: flex; gap: 15px; margin-bottom: 30px; }
+        .tab-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--neon-primary); color: #fff; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { background: var(--neon-primary); box-shadow: 0 0 15px var(--neon-primary); }
+        .tab-content { width: 100%; max-width: 800px; }
+        .box { background: var(--surface-color); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 25px; }
+        #guestbook-form { display: flex; flex-direction: column; gap: 10px; }
+        #guestbook-form input, textarea { background: #000; border: 1px solid #333; color: var(--neon-terminal); padding: 12px; font-family: 'Share Tech Mono', monospace; border-radius: 5px; }
+        #submit-btn { background: var(--neon-primary); color: #fff; border: none; padding: 12px; cursor: pointer; font-weight: 600; border-radius: 5px; }
+        #status-log { font-family: 'Share Tech Mono', monospace; font-size: 12px; margin-top: 10px; color: #666; }
     </style>
 </head>
 <body>
-
     <header>
         <a href="index.html" class="logo">MacroList</a>
         <div class="nav-actions">
             <a href="index.html" class="nav-link">Каталог</a>
             <a href="forum.html" class="nav-link active">Обсуждение</a>
-            <a href="submit.html" class="nav-link" style="border: 1px solid var(--neon-primary); padding: 5px 15px; border-radius: 6px;">Предложить макрос</a>
         </div>
     </header>
-
     <main>
-        <div class="forum-header-section">
-            <div class="forum-title">
-                <h1>Live <span>Обсуждение</span></h1>
-                <p>Авторизуйся через Telegram, чтобы оставить комментарий. Все сообщения синхронизируются с нашим каналом.</p>
-            </div>
+        <div class="toggle-container">
+            <button class="tab-btn active" onclick="switchTab('tg', this)">TELEGRAM ЧАТ</button>
+            <button class="tab-btn" onclick="switchTab('term', this)">АНОНИМНЫЙ ТЕРМИНАЛ</button>
         </div>
-
-        <div class="tg-comments-container">
-            <!-- Родной адрес скрипта восстановлен, а твой канал привязан ниже -->
-            <script async src="https://telegram.org/js/telegram-widget.js?22" 
-                    data-telegram-discussion="macrolist/19" 
-                    data-comments-limit="10" 
-                    data-color="8a2be2" 
-                    data-dark="1">
-            </script>
-        </div>
+        <div id="tab-tg" class="tab-content"><div class="box">
+            <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-discussion="macrolist/1" data-comments-limit="10" data-color="8a2be2" data-dark="1"></script>
+        </div></div>
+        <div id="tab-term" class="tab-content" style="display: none;"><div class="box">
+            <form id="guestbook-form">
+                <input type="text" name="nickname" placeholder="Nickname" maxlength="15" required>
+                <textarea name="message" placeholder="Введите сообщение..." maxlength="200" required></textarea>
+                <button type="submit" id="submit-btn">ОТПРАВИТЬ ПАКЕТ</button>
+                <div id="status-log">STATUS: READY_TO_SEND</div>
+            </form>
+        </div></div>
     </main>
-<div class="terminal-container">
-    <form id="guestbook-form">
-        <input type="text" name="nickname" placeholder="Аноним" maxlength="15" required>
-        <textarea name="message" placeholder="Введите сообщение..." maxlength="200" required></textarea>
-        <button type="submit">ОТПРАВИТЬ ПАКЕТ</button>
-    </form>
-</div>
+    <script>
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).style.display = 'block';
+            btn.classList.add('active');
+        }
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwobw-qJ929lw309XkX9ntipq5dmDfSsA3ryEBOQ4TsYiscmj83eAq9jq_hlse_NGZLxg/exec";
+        const form = document.getElementById('guestbook-form');
+        const statusLog = document.getElementById('status-log');
+        const submitBtn = document.getElementById('submit-btn');
 
-<div id="messages-display">
-    <!-- Сюда скрипт будет подтягивать сообщения -->
-</div>
-
-<script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwobw-qJ929lw309XkX9ntipq5dmDfSsA3ryEBOQ4TsYiscmj83eAq9jq_hlse_NGZLxg/exec";
-
-    document.getElementById('guestbook-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: new FormData(this)
-        }).then(() => {
-            alert('Сообщение отправлено в сеть!');
-            this.reset();
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            statusLog.innerText = "STATUS: SENDING_PACKET...";
+            fetch(SCRIPT_URL, { method: 'POST', body: new FormData(this) })
+            .then(() => {
+                statusLog.innerText = "STATUS: PACKET_SENT_SUCCESSFULLY";
+                form.reset();
+                setTimeout(() => { statusLog.innerText = "STATUS: READY_TO_SEND"; submitBtn.disabled = false; }, 3000);
+            }).catch(() => { statusLog.innerText = "STATUS: ERROR_CONNECTION_FAILED"; submitBtn.disabled = false; });
         });
-    });
-</script>
+    </script>
 </body>
 </html>
