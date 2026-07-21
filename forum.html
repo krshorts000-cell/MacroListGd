@@ -3,247 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MacroList | Обсуждение</title>
+    <title>MacroList | Анонимный Терминал</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Share+Tech+Mono&display=swap');
-        
-        :root { 
-            --bg-color: #050505; 
-            --surface-color: rgba(18, 18, 18, 0.65); 
-            --neon-primary: #8a2be2; 
-            --neon-terminal: #00f0ff; 
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --bg-color: #050505;
+            --term-green: #00ff41;
+            --term-dark: #003300;
+            --term-cyan: #00f0ff;
+            --text-muted: #666;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Share Tech Mono', monospace; }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg-color); color: #f5f5f7; min-height: 100vh; }
+        body { background-color: var(--bg-color); color: var(--term-green); display: flex; flex-direction: column; min-height: 100vh; padding: 20px; }
         
-        header { 
-            padding: 20px 40px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .logo { font-size: 24px; font-weight: 600; text-transform: uppercase; text-decoration: none; color: #fff; }
-        .nav-actions { display: flex; gap: 20px; }
-        .nav-link { color: #999; text-decoration: none; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { color: #fff; }
+        /* Стили скроллбара */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--term-dark); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--term-green); }
+
+        header { border-bottom: 1px solid var(--term-dark); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; color: var(--term-green); text-decoration: none; text-transform: uppercase; text-shadow: 0 0 10px var(--term-green); }
+        .btn { background: transparent; color: var(--term-green); border: 1px solid var(--term-green); padding: 8px 16px; cursor: pointer; font-size: 16px; transition: 0.2s; text-decoration: none; }
+        .btn:hover { background: var(--term-green); color: #000; box-shadow: 0 0 15px var(--term-green); }
         
-        main { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+        main { max-width: 900px; width: 100%; margin: 0 auto; flex: 1; }
         
-        /* Кнопки переключения */
-        .toggle-container { display: flex; gap: 15px; margin-bottom: 30px; }
-        .tab-btn { 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid var(--neon-primary); 
-            color: #fff; 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-        }
-        .tab-btn.active { 
-            background: var(--neon-primary); 
-            box-shadow: 0 0 15px var(--neon-primary); 
-        }
-        
-        /* Контейнеры */
-        .tab-content { width: 100%; max-width: 800px; }
-        .box { 
-            background: var(--surface-color); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255,255,255,0.05); 
-            border-bottom: 2px solid rgba(138, 43, 226, 0.4);
-            border-radius: 16px; 
-            padding: 25px; 
-            min-height: 400px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-        
-        /* Стили терминала */
-        #guestbook-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        #guestbook-form input, #guestbook-form textarea { 
-            background: #000; 
-            border: 1px solid #333; 
-            color: var(--neon-terminal); 
-            padding: 12px; 
-            font-family: 'Share Tech Mono', monospace; 
-            border-radius: 5px; 
-            resize: vertical;
-        }
-        #submit-btn { 
-            background: var(--neon-primary); 
-            color: #fff; 
-            border: none; 
-            padding: 12px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            border-radius: 5px; 
-            transition: 0.3s;
-        }
-        #submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        #submit-btn:hover:not(:disabled) { box-shadow: 0 0 10px var(--neon-primary); }
-        #status-log { font-family: 'Share Tech Mono', monospace; font-size: 12px; margin-top: 5px; color: #999; }
-        
-        /* Стили ленты сообщений */
-        .message-item {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Share Tech Mono', monospace;
-            word-wrap: break-word;
-        }
-        .message-header { color: var(--neon-primary); font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        .message-body { color: #e0e0e0; font-size: 15px; }
+        .sys-msg { color: var(--term-cyan); margin-bottom: 20px; border-left: 2px solid var(--term-cyan); padding-left: 10px; }
+
+        /* СПИСОК ТРЕДОВ */
+        #threads-view { display: flex; flex-direction: column; gap: 15px; }
+        .thread-card { border: 1px solid var(--term-dark); padding: 15px; background: rgba(0, 255, 65, 0.02); cursor: pointer; transition: 0.2s; }
+        .thread-card:hover { border-color: var(--term-green); transform: translateX(5px); }
+        .thread-title { font-size: 20px; margin-bottom: 10px; color: #fff; }
+        .thread-meta { font-size: 14px; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .thread-meta span { color: var(--term-cyan); }
+
+        /* ПРОСМОТР ОДНОГО ТРЕДА */
+        #single-thread-view { display: none; flex-direction: column; gap: 20px; }
+        .post-card { border: 1px solid var(--term-dark); padding: 15px; }
+        .op-post { border-color: var(--term-cyan); background: rgba(0, 240, 255, 0.05); }
+        .post-header { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; border-bottom: 1px dashed var(--term-dark); padding-bottom: 5px; }
+        .post-author { color: var(--term-cyan); font-weight: bold; }
+        .post-id { color: var(--text-muted); }
+        .post-text { color: #ccc; line-height: 1.5; white-space: pre-wrap; }
+
+        .back-btn { margin-bottom: 20px; display: inline-block; color: var(--text-muted); cursor: pointer; }
+        .back-btn:hover { color: var(--term-cyan); }
+
+        #loader { text-align: center; color: var(--term-cyan); font-size: 18px; margin-top: 50px; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
     </style>
 </head>
 <body>
+
     <header>
-        <a href="index.html" class="logo">MacroList</a>
-        <div class="nav-actions">
-            <a href="index.html" class="nav-link">Каталог</a>
-            <a href="forum.html" class="nav-link active">Обсуждение</a>
-        </div>
+        <a href="index.html" class="logo">MacroList // Terminal</a>
+        <button class="btn" onclick="createNewThread()">[+] СОЗДАТЬ ТРЕД</button>
     </header>
-    
+
     <main>
-        <!-- Переключатель -->
-        <div class="toggle-container">
-            <button class="tab-btn active" onclick="switchTab('tg', this)">TELEGRAM ЧАТ</button>
-            <button class="tab-btn" onclick="switchTab('term', this)">АНОНИМНЫЙ ТЕРМИНАЛ</button>
+        <div id="loader">УСТАНОВКА СОЕДИНЕНИЯ С СЕРВЕРОМ...</div>
+
+        <!-- Экран списка тредов -->
+        <div id="threads-view">
+            <div class="sys-msg">> ЗАГРУЖЕНЫ 5 АКТИВНЫХ ОБСУЖДЕНИЙ. ВЫБЕРИТЕ ТРЕД ДЛЯ ПОДКЛЮЧЕНИЯ.</div>
+            <div id="threads-container"></div>
         </div>
-        
-        <!-- Блок Telegram -->
-        <div id="tab-tg" class="tab-content">
-            <div class="box">
-                <!-- Виджет строго настроен на macrolist/19 -->
-                <script async src="https://telegram.org/js/telegram-widget.js?22" 
-                    data-telegram-discussion="macrolist/19" 
-                    data-comments-limit="10" 
-                    data-color="8a2be2" 
-                    data-dark="1">
-                </script>
+
+        <!-- Экран одного треда -->
+        <div id="single-thread-view">
+            <div class="back-btn" onclick="showThreadsList()">[< НАЗАД В КАТАЛОГ ТРЕДОВ]</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 id="current-thread-title" style="color: #fff;">Загрузка...</h2>
+                <button class="btn" id="reply-btn" style="border-color: var(--term-cyan); color: var(--term-cyan);">[>] ОТВЕТИТЬ В ТРЕД</button>
             </div>
-        </div>
-        
-        <!-- Блок Терминал -->
-        <div id="tab-term" class="tab-content" style="display: none;">
-            <div class="box">
-                <form id="guestbook-form">
-                    <input type="text" name="nickname" placeholder="Nickname (Аноним)" maxlength="15" required>
-                    <textarea name="message" placeholder="Введите сообщение... (можно прикрепить ссылку на imgur)" maxlength="200" required></textarea>
-                    <button type="submit" id="submit-btn">ОТПРАВИТЬ ПАКЕТ</button>
-                    <div id="status-log">STATUS: READY_TO_SEND</div>
-                </form>
-                
-                <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
-                
-                <!-- Контейнер для вывода сообщений -->
-                <div id="messages-list" style="display: flex; flex-direction: column; gap: 15px;">
-                    <div style='color: #666; font-family: monospace;'>INITIALIZING_RECEIVER...</div>
-                </div>
-            </div>
+            <div id="posts-container" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;"></div>
         </div>
     </main>
-    
+
     <script>
-        // Переключение вкладок
-        function switchTab(tab, btn) {
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tab).style.display = 'block';
-            btn.classList.add('active');
-            
-            // Если открыли терминал, подтягиваем сообщения
-            if(tab === 'term') {
-                loadMessages();
+        // === ВСТАВЬ СЮДА ССЫЛКУ ИЗ GOOGLE APPS SCRIPT ===
+        const API_URL = "ВСТАВЬ_СЮДА_УРЛ_СКРИПТА"; 
+        
+        // === МАГИЯ ПРЕДЗАПОЛНЕНИЯ (НАСТРОИМ В СЛЕДУЮЩЕМ ШАГЕ) ===
+        // Базовая ссылка на Гугл Форму
+        const FORM_BASE_URL = "ВСТАВЬ_ССЫЛКУ_НА_ФОРМУ_ЗДЕСЬ"; 
+        const ENTRY_THREAD_ID = "entry.123456789"; // ID поля Thread_ID
+        const ENTRY_TITLE = "entry.987654321";     // ID поля Заголовок
+
+        let forumData = {}; 
+
+        const threadsView = document.getElementById('threads-view');
+        const singleThreadView = document.getElementById('single-thread-view');
+        const loader = document.getElementById('loader');
+
+        // Функция парсинга и группировки
+        async function loadForum() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                loader.style.display = 'none';
+                
+                if (data.error) {
+                    threadsView.innerHTML = `<div style="color: red;">CRITICAL ERROR: ${data.error}</div>`;
+                    return;
+                }
+
+                // Группируем посты по Thread_ID
+                forumData = {};
+                data.forEach(post => {
+                    if(!post.threadId) return;
+                    if(!forumData[post.threadId]) {
+                        forumData[post.threadId] = {
+                            id: post.threadId,
+                            title: 'Безымянный тред',
+                            posts: [],
+                            lastUpdate: new Date(post.date).getTime()
+                        };
+                    }
+                    forumData[post.threadId].posts.push(post);
+                    // Ищем заголовок (обычно он есть у первого поста)
+                    if(post.title) forumData[post.threadId].title = post.title;
+                    // Обновляем время последней активности
+                    const postTime = new Date(post.date).getTime();
+                    if(postTime > forumData[post.threadId].lastUpdate) {
+                        forumData[post.threadId].lastUpdate = postTime;
+                    }
+                });
+
+                renderThreadsList();
+            } catch (err) {
+                console.error(err);
+                loader.innerText = "ОШИБКА ПОДКЛЮЧЕНИЯ К БАЗЕ. ДОСТУП ЗАКРЫТ.";
+                loader.style.color = "red";
             }
         }
 
-        // Общая ссылка на Google Apps Script
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLH51FgbnKygtvU6U3gKcepGvHXrV1QimDWGQ-3Sj3WXCPV2EUy0gxfNeZLuK3Q83e2g/exec";
-        
-        // ----------------------------------------------------
-        // ЛОГИКА ОТПРАВКИ СООБЩЕНИЯ (POST)
-        // ----------------------------------------------------
-        const form = document.getElementById('guestbook-form');
-        const statusLog = document.getElementById('status-log');
-        const submitBtn = document.getElementById('submit-btn');
+        // Вывод списка топ-5 тредов
+        function renderThreadsList() {
+            const container = document.getElementById('threads-container');
+            container.innerHTML = '';
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+            // Превращаем объект в массив и сортируем по дате (самые свежие сверху)
+            const threadsArray = Object.values(forumData).sort((a, b) => b.lastUpdate - a.lastUpdate);
             
-            submitBtn.disabled = true;
-            statusLog.innerText = "STATUS: SENDING_PACKET...";
-            statusLog.style.color = "#ffaa00"; 
-            
-            fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                mode: 'no-cors',
-                body: new FormData(form) 
-            })
-            .then(() => {
-                statusLog.innerText = "STATUS: PACKET_SENT_SUCCESSFULLY";
-                statusLog.style.color = "#00ff00"; 
-                form.reset();
+            if(threadsArray.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-muted);">БАЗА ДАННЫХ ПУСТА. СТАНЬТЕ ПЕРВЫМ.</div>';
+                return;
+            }
+
+            // Берем только 5 самых активных
+            const topThreads = threadsArray.slice(0, 5);
+
+            topThreads.forEach(thread => {
+                const card = document.createElement('div');
+                card.className = 'thread-card';
                 
-                // Задержка перед обновлением ленты, чтобы Google успел записать данные
-                setTimeout(() => {
-                    loadMessages();
-                    statusLog.innerText = "STATUS: READY_TO_SEND"; 
-                    statusLog.style.color = "#999"; 
-                    submitBtn.disabled = false; 
-                }, 2000);
-            })
-            .catch((err) => { 
-                console.error(err);
-                statusLog.innerText = "STATUS: ERROR_CONNECTION_FAILED"; 
-                statusLog.style.color = "#ff0000"; 
-                submitBtn.disabled = false; 
+                const repliesCount = thread.posts.length - 1; // Вычитаем OP (первый пост)
+
+                card.innerHTML = `
+                    <div class="thread-title">${thread.title}</div>
+                    <div class="thread-meta">
+                        <div>ID: <span>${thread.id}</span></div>
+                        <div>ОТВЕТОВ: <span>${repliesCount > 0 ? repliesCount : 0}</span></div>
+                    </div>
+                `;
+                
+                card.onclick = () => openThread(thread.id);
+                container.appendChild(card);
             });
-        });
-
-        // ----------------------------------------------------
-        // ЛОГИКА ЗАГРУЗКИ СООБЩЕНИЙ (GET)
-        // ----------------------------------------------------
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, tag => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-            }[tag]));
         }
 
-        function loadMessages() {
-            const list = document.getElementById('messages-list');
-            list.innerHTML = "<div style='color: #666; font-family: monospace;'>DOWNLOADING_PACKETS...</div>";
+        // Открытие конкретного треда
+        function openThread(threadId) {
+            threadsView.style.display = 'none';
+            singleThreadView.style.display = 'flex';
+            
+            const thread = forumData[threadId];
+            document.getElementById('current-thread-title').innerText = thread.title;
+            
+            // Настраиваем кнопку ответа
+            document.getElementById('reply-btn').onclick = () => {
+                // Создаем ссылку для ответа (Заголовок пустой, ID заполнен)
+                const replyUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${thread.id}`;
+                window.open(replyUrl, '_blank');
+            };
 
-            fetch(SCRIPT_URL)
-                .then(res => res.json())
-                .then(data => {
-                    list.innerHTML = "";
-                    if (data.length === 0) {
-                        list.innerHTML = "<div style='color: #666; font-family: monospace;'>NO_PACKETS_FOUND</div>";
-                        return;
-                    }
-                    // Выводим новые сверху (реверс массива)
-                    data.reverse().forEach(item => {
-                        const safeName = escapeHTML(item.nickname || 'Аноним');
-                        const safeMsg = escapeHTML(item.message || '');
-                        
-                        const msgBox = document.createElement('div');
-                        msgBox.className = 'message-item';
-                        msgBox.innerHTML = `
-                            <div class="message-header">[${safeName}]</div>
-                            <div class="message-body">${safeMsg}</div>
-                        `;
-                        list.appendChild(msgBox);
-                    });
-                })
-                .catch(err => {
-                    console.error("Ошибка загрузки:", err);
-                    list.innerHTML = "<div style='color: #ff0000; font-family: monospace;'>FAILED_TO_LOAD_MESSAGES. Проверьте функцию doGet в Apps Script.</div>";
-                });
+            const container = document.getElementById('posts-container');
+            container.innerHTML = '';
+
+            thread.posts.forEach((post, index) => {
+                const isOp = index === 0; // Первый пост выделяем
+                const postDiv = document.createElement('div');
+                postDiv.className = `post-card ${isOp ? 'op-post' : ''}`;
+                
+                const dateStr = new Date(post.date).toLocaleString('ru-RU');
+
+                postDiv.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-author">${post.author || 'Аноним'} ${isOp ? '[OP]' : ''}</div>
+                        <div class="post-id">${dateStr}</div>
+                    </div>
+                    <div class="post-text">${post.message}</div>
+                `;
+                container.appendChild(postDiv);
+            });
         }
+
+        // Возврат к списку
+        function showThreadsList() {
+            singleThreadView.style.display = 'none';
+            threadsView.style.display = 'flex';
+            loadForum(); // Перезагружаем базу, вдруг кто-то ответил
+        }
+
+        // Генерация нового треда
+        function createNewThread() {
+            // Генерируем случайный ID для нового треда (например: thread_x8f9a)
+            const newThreadId = 'thread_' + Math.random().toString(36).substr(2, 6);
+            
+            // Ссылка с предзаполненным ID
+            const createUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${newThreadId}`;
+            window.open(createUrl, '_blank');
+        }
+
+        // Запуск
+        loadForum();
     </script>
 </body>
 </html>
