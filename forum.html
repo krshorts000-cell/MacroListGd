@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacroList | Анонимный Терминал</title>
+
+    <!-- Скрипт Turnstile подключен корректно в head -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
         :root {
             --bg-color: #050505;
@@ -68,9 +71,10 @@
 
     <main>
         <!-- Виджет Cloudflare Turnstile -->
-<div style="display: flex; justify-content: center; margin-bottom: 20px;">
-    <div class="cf-turnstile" data-sitekey="0x4AAAAAAD6qfUNle89ek583" data-callback="onTurnstileSuccess"></div>
-</div>
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAAD6qfUNle89ek583" data-callback="onTurnstileSuccess"></div>
+        </div>
+
         <div id="loader">УСТАНОВКА СОЕДИНЕНИЯ С СЕРВЕРОМ...</div>
 
         <!-- Экран списка тредов -->
@@ -91,73 +95,30 @@
     </main>
 
     <script>
-        // Переменная статуса проверки
-        let isHumanVerified = false;
-
-        // Колбэк-функция: вызывается автоматически, когда Cloudflare проверил юзера
-        function onTurnstileSuccess(token) {
-            isHumanVerified = true;
-            console.log("Проверка на человека успешно пройдена!");
-        }
-
-        // Создание треда с двойной защитой (Кулдаун + Turnstile)
-        function createNewThread() {
-            if (!isHumanVerified) {
-                alert("ОШИБКА БЕЗОПАСНОСТИ: Пройдите проверку Cloudflare перед созданием треда!");
-                return;
-            }
-
-            const lastPost = localStorage.getItem('last_thread_create');
-            if (lastPost && (Date.now() - lastPost < 30000)) {
-                const waitSec = Math.ceil((30000 - (Date.now() - lastPost)) / 1000);
-                alert(`ПОДОЖДИТЕ ${waitSec} СЕК. ПЕРЕД СОЗДАНИЕМ НОВОГО ТРЕДА!`);
-                return;
-            }
-
-            localStorage.setItem('last_thread_create', Date.now());
-            const newThreadId = 'thread_' + Math.random().toString(36).substr(2, 6);
-            const createUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${newThreadId}`;
-            window.open(createUrl, '_blank');
-        }
-
-        // В функции openThread обнови обработчик кнопки ответа:
-        function openThread(threadId) {
-            threadsView.style.display = 'none';
-            singleThreadView.style.display = 'flex';
-            
-            const thread = forumData[threadId];
-            document.getElementById('current-thread-title').innerText = thread.title;
-            
-            document.getElementById('reply-btn').onclick = () => {
-                if (!isHumanVerified) {
-                    alert("ОШИБКА БЕЗОПАСНОСТИ: Пройдите проверку Cloudflare на главной странице перед ответом!");
-                    return;
-                }
-                const replyUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${thread.id}`;
-                window.open(replyUrl, '_blank');
-            };
-
-            // ... остальной код отрисовки постов ...
-        }
-        // === ВСТАВЬ СЮДА ССЫЛКУ ИЗ GOOGLE APPS SCRIPT ===
+        // === НАСТРОЙКИ СВЯЗИ ===
         const API_URL = "https://script.google.com/macros/s/AKfycbwF4B2WhBFPg52nJbkoMkEdQ8rOwXNQdfTZFBs-J4mp8T6UW-iKN3uqmRusfZ_xNTDHUw/exec"; 
-        
-        // === МАГИЯ ПРЕДЗАПОЛНЕНИЯ ===
         const FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeSe8_XeuS03tq-XCcAjS9NzzxaY-ZLh8UZh4qGO_H9-eI9mg/viewform"; 
         const ENTRY_THREAD_ID = "entry.1990468297"; 
         const ENTRY_TITLE = "entry.1962415683";
 
         let forumData = {}; 
+        let isHumanVerified = false;
 
         const threadsView = document.getElementById('threads-view');
         const singleThreadView = document.getElementById('single-thread-view');
         const loader = document.getElementById('loader');
-        // 1. Кэширование базы в память браузера (чтобы не нагружать Wi-Fi лишними запросами)
+
+        // Колбэк капчи
+        function onTurnstileSuccess(token) {
+            isHumanVerified = true;
+            console.log("Проверка на человека успешно пройдена!");
+        }
+
+        // Загрузка форума (с кэшированием)
         async function loadForum(forceReload = false) {
             const cachedData = localStorage.getItem('forum_cache');
             const cacheTime = localStorage.getItem('forum_cache_time');
             
-            // Если кэш свежий (меньше 1 минуты) и мы не запрашивали принудительную перезагрузку
             if (!forceReload && cachedData && cacheTime && (Date.now() - cacheTime < 60000)) {
                 if (loader) loader.style.display = 'none';
                 processForumData(JSON.parse(cachedData));
@@ -175,7 +136,6 @@
                     return;
                 }
 
-                // Сохраняем свежие данные в кэш
                 localStorage.setItem('forum_cache', JSON.stringify(data));
                 localStorage.setItem('forum_cache_time', Date.now());
 
@@ -189,7 +149,7 @@
             }
         }
 
-        // Обработка данных
+        // Обработка постов
         function processForumData(data) {
             forumData = {};
             data.forEach(post => {
@@ -213,92 +173,24 @@
             renderThreadsList();
         }
 
-        // 2. Кулдаун 30 секунд на создание треда (защита от спама)
-        function createNewThread() {
-            const lastPost = localStorage.getItem('last_thread_create');
-            if (lastPost && (Date.now() - lastPost < 30000)) {
-                const waitSec = Math.ceil((30000 - (Date.now() - lastPost)) / 1000);
-                alert(`ПОДОЖДИТЕ ${waitSec} СЕК. ПЕРЕД СОЗДАНИЕМ НОВОГО ТРЕДА!`);
-                return;
-            }
-
-            localStorage.setItem('last_thread_create', Date.now());
-            const newThreadId = 'thread_' + Math.random().toString(36).substr(2, 6);
-            const createUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${newThreadId}`;
-            window.open(createUrl, '_blank');
-        }
-
-        // 3. Возврат к списку с принудительным обновлением
-        function showThreadsList() {
-            singleThreadView.style.display = 'none';
-            threadsView.style.display = 'flex';
-            loadForum(true); // Перезагружаем с сервера при возврате
-        }
-
-        // Функция парсинга и группировки
-        async function loadForum() {
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                
-                loader.style.display = 'none';
-                
-                if (data.error) {
-                    threadsView.innerHTML = `<div style="color: red;">CRITICAL ERROR: ${data.error}</div>`;
-                    return;
-                }
-
-                // Группируем посты по Thread_ID
-                forumData = {};
-                data.forEach(post => {
-                    if(!post.threadId) return;
-                    if(!forumData[post.threadId]) {
-                        forumData[post.threadId] = {
-                            id: post.threadId,
-                            title: 'Безымянный тред',
-                            posts: [],
-                            lastUpdate: new Date(post.date).getTime()
-                        };
-                    }
-                    forumData[post.threadId].posts.push(post);
-                    // Ищем заголовок (обычно он есть у первого поста)
-                    if(post.title) forumData[post.threadId].title = post.title;
-                    // Обновляем время последней активности
-                    const postTime = new Date(post.date).getTime();
-                    if(postTime > forumData[post.threadId].lastUpdate) {
-                        forumData[post.threadId].lastUpdate = postTime;
-                    }
-                });
-
-                renderThreadsList();
-            } catch (err) {
-                console.error(err);
-                loader.innerText = "ОШИБКА ПОДКЛЮЧЕНИЯ К БАЗЕ. ДОСТУП ЗАКРЫТ.";
-                loader.style.color = "red";
-            }
-        }
-
-        // Вывод списка топ-5 тредов
+        // Рендер каталога
         function renderThreadsList() {
             const container = document.getElementById('threads-container');
             container.innerHTML = '';
 
-            // Превращаем объект в массив и сортируем по дате (самые свежие сверху)
             const threadsArray = Object.values(forumData).sort((a, b) => b.lastUpdate - a.lastUpdate);
             
             if(threadsArray.length === 0) {
-                container.innerHTML = '<div style="color: var(--text-muted);">БАЗА ДАННЫХ ПУСТА. СТАНЬТЕ ПЕРВЫМ.</div>';
+                container.innerHTML = '<div style="color: var(--text-muted); text-align: center; margin-top: 20px;">БАЗА ДАННЫХ ПУСТА. СТАНЬТЕ ПЕРВЫМ!</div>';
                 return;
             }
 
-            // Берем только 5 самых активных
             const topThreads = threadsArray.slice(0, 5);
 
             topThreads.forEach(thread => {
                 const card = document.createElement('div');
                 card.className = 'thread-card';
-                
-                const repliesCount = thread.posts.length - 1; // Вычитаем OP (первый пост)
+                const repliesCount = thread.posts.length - 1;
 
                 card.innerHTML = `
                     <div class="thread-title">${thread.title}</div>
@@ -321,9 +213,11 @@
             const thread = forumData[threadId];
             document.getElementById('current-thread-title').innerText = thread.title;
             
-            // Настраиваем кнопку ответа
             document.getElementById('reply-btn').onclick = () => {
-                // Создаем ссылку для ответа (Заголовок пустой, ID заполнен)
+                if (!isHumanVerified) {
+                    alert("ОШИБКА БЕЗОПАСНОСТИ: Пройдите проверку Cloudflare перед ответом!");
+                    return;
+                }
                 const replyUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${thread.id}`;
                 window.open(replyUrl, '_blank');
             };
@@ -332,7 +226,7 @@
             container.innerHTML = '';
 
             thread.posts.forEach((post, index) => {
-                const isOp = index === 0; // Первый пост выделяем
+                const isOp = index === 0;
                 const postDiv = document.createElement('div');
                 postDiv.className = `post-card ${isOp ? 'op-post' : ''}`;
                 
@@ -349,24 +243,34 @@
             });
         }
 
-        // Возврат к списку
+        // Возврат назад
         function showThreadsList() {
             singleThreadView.style.display = 'none';
             threadsView.style.display = 'flex';
-            loadForum(); // Перезагружаем базу, вдруг кто-то ответил
+            loadForum(true); 
         }
 
-        // Генерация нового треда
+        // Создание нового треда (с кулдауном и Turnstile)
         function createNewThread() {
-            // Генерируем случайный ID для нового треда (например: thread_x8f9a)
+            if (!isHumanVerified) {
+                alert("ОШИБКА БЕЗОПАСНОСТИ: Пройдите проверку Cloudflare перед созданием треда!");
+                return;
+            }
+
+            const lastPost = localStorage.getItem('last_thread_create');
+            if (lastPost && (Date.now() - lastPost < 30000)) {
+                const waitSec = Math.ceil((30000 - (Date.now() - lastPost)) / 1000);
+                alert(`ПОДОЖДИТЕ ${waitSec} СЕК. ПЕРЕД СОЗДАНИЕМ НОВОГО ТРЕДА!`);
+                return;
+            }
+
+            localStorage.setItem('last_thread_create', Date.now());
             const newThreadId = 'thread_' + Math.random().toString(36).substr(2, 6);
-            
-            // Ссылка с предзаполненным ID
             const createUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${newThreadId}`;
             window.open(createUrl, '_blank');
         }
 
-        // Запуск
+        // Старт
         loadForum();
     </script>
 </body>
