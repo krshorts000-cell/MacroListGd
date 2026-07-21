@@ -61,7 +61,7 @@
         }
         
         /* Стили терминала */
-        #guestbook-form { display: flex; flex-direction: column; gap: 10px; }
+        #guestbook-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
         #guestbook-form input, #guestbook-form textarea { 
             background: #000; 
             border: 1px solid #333; 
@@ -83,7 +83,19 @@
         }
         #submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         #submit-btn:hover:not(:disabled) { box-shadow: 0 0 10px var(--neon-primary); }
-        #status-log { font-family: 'Share Tech Mono', monospace; font-size: 12px; margin-top: 10px; color: #999; }
+        #status-log { font-family: 'Share Tech Mono', monospace; font-size: 12px; margin-top: 5px; color: #999; }
+        
+        /* Стили ленты сообщений */
+        .message-item {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            word-wrap: break-word;
+        }
+        .message-header { color: var(--neon-primary); font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        .message-body { color: #e0e0e0; font-size: 15px; }
     </style>
 </head>
 <body>
@@ -105,6 +117,7 @@
         <!-- Блок Telegram -->
         <div id="tab-tg" class="tab-content">
             <div class="box">
+                <!-- Виджет строго настроен на macrolist/19 -->
                 <script async src="https://telegram.org/js/telegram-widget.js?22" 
                     data-telegram-discussion="macrolist/19" 
                     data-comments-limit="10" 
@@ -118,26 +131,42 @@
         <div id="tab-term" class="tab-content" style="display: none;">
             <div class="box">
                 <form id="guestbook-form">
-                    <input type="text" name="nickname" placeholder="Nickname" maxlength="15" required>
+                    <input type="text" name="nickname" placeholder="Nickname (Аноним)" maxlength="15" required>
                     <textarea name="message" placeholder="Введите сообщение... (можно прикрепить ссылку на imgur)" maxlength="200" required></textarea>
                     <button type="submit" id="submit-btn">ОТПРАВИТЬ ПАКЕТ</button>
                     <div id="status-log">STATUS: READY_TO_SEND</div>
                 </form>
+                
+                <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+                
+                <!-- Контейнер для вывода сообщений -->
+                <div id="messages-list" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style='color: #666; font-family: monospace;'>INITIALIZING_RECEIVER...</div>
+                </div>
             </div>
         </div>
     </main>
     
     <script>
-        // Логика переключения вкладок
+        // Переключение вкладок
         function switchTab(tab, btn) {
             document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + tab).style.display = 'block';
             btn.classList.add('active');
+            
+            // Если открыли терминал, подтягиваем сообщения
+            if(tab === 'term') {
+                loadMessages();
+            }
         }
 
-        // Логика отправки пакета в Google Таблицу
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLH51FgbnKygtvU6U3gKcepGvHXrV1QimDWGQ-3Sj3WXCPV2EUy0gxfNeZLuK3Q83e2g/exec";
+        // Общая ссылка на Google Apps Script
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwobw-qJ929lw309XkX9ntipq5dmDfSsA3ryEBOQ4TsYiscmj83eAq9jq_hlse_NGZLxg/exec";
+        
+        // ----------------------------------------------------
+        // ЛОГИКА ОТПРАВКИ СООБЩЕНИЯ (POST)
+        // ----------------------------------------------------
         const form = document.getElementById('guestbook-form');
         const statusLog = document.getElementById('status-log');
         const submitBtn = document.getElementById('submit-btn');
@@ -147,32 +176,74 @@
             
             submitBtn.disabled = true;
             statusLog.innerText = "STATUS: SENDING_PACKET...";
-            statusLog.style.color = "#ffaa00"; // Желтый цвет ожидания
+            statusLog.style.color = "#ffaa00"; 
             
             fetch(SCRIPT_URL, { 
                 method: 'POST', 
-                mode: 'no-cors', // СПАСИТЕЛЬНЫЙ ПАРАМЕТР
+                mode: 'no-cors',
                 body: new FormData(form) 
             })
             .then(() => {
-                // Из-за no-cors браузер не прочитает ответ, но если скрипт не упал, пакет ушел
                 statusLog.innerText = "STATUS: PACKET_SENT_SUCCESSFULLY";
-                statusLog.style.color = "#00ff00"; // Зеленый цвет успеха
+                statusLog.style.color = "#00ff00"; 
                 form.reset();
                 
-                setTimeout(() => { 
+                // Задержка перед обновлением ленты, чтобы Google успел записать данные
+                setTimeout(() => {
+                    loadMessages();
                     statusLog.innerText = "STATUS: READY_TO_SEND"; 
-                    statusLog.style.color = "#999"; // Возвращаем серый цвет
+                    statusLog.style.color = "#999"; 
                     submitBtn.disabled = false; 
-                }, 3500);
+                }, 2000);
             })
             .catch((err) => { 
                 console.error(err);
                 statusLog.innerText = "STATUS: ERROR_CONNECTION_FAILED"; 
-                statusLog.style.color = "#ff0000"; // Красный цвет ошибки
+                statusLog.style.color = "#ff0000"; 
                 submitBtn.disabled = false; 
             });
         });
+
+        // ----------------------------------------------------
+        // ЛОГИКА ЗАГРУЗКИ СООБЩЕНИЙ (GET)
+        // ----------------------------------------------------
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
+        function loadMessages() {
+            const list = document.getElementById('messages-list');
+            list.innerHTML = "<div style='color: #666; font-family: monospace;'>DOWNLOADING_PACKETS...</div>";
+
+            fetch(SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    list.innerHTML = "";
+                    if (data.length === 0) {
+                        list.innerHTML = "<div style='color: #666; font-family: monospace;'>NO_PACKETS_FOUND</div>";
+                        return;
+                    }
+                    // Выводим новые сверху (реверс массива)
+                    data.reverse().forEach(item => {
+                        const safeName = escapeHTML(item.nickname || 'Аноним');
+                        const safeMsg = escapeHTML(item.message || '');
+                        
+                        const msgBox = document.createElement('div');
+                        msgBox.className = 'message-item';
+                        msgBox.innerHTML = `
+                            <div class="message-header">[${safeName}]</div>
+                            <div class="message-body">${safeMsg}</div>
+                        `;
+                        list.appendChild(msgBox);
+                    });
+                })
+                .catch(err => {
+                    console.error("Ошибка загрузки:", err);
+                    list.innerHTML = "<div style='color: #ff0000; font-family: monospace;'>FAILED_TO_LOAD_MESSAGES. Проверьте функцию doGet в Apps Script.</div>";
+                });
+        }
     </script>
 </body>
 </html>
