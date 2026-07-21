@@ -17,304 +17,52 @@
             --neon-cyan: #00ffff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(18, 18, 18, 0.7);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 600;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: text-shadow 0.3s ease;
-            color: var(--text-main);
-            text-decoration: none;
-        }
-
-        .logo:hover {
-            text-shadow: 0 0 15px var(--neon-primary);
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .tg-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .tg-link:hover {
-            color: #0088cc;
-            text-shadow: 0 0 10px rgba(0, 136, 204, 0.5);
-        }
-
-        .btn-submit {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid var(--neon-primary);
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-submit:hover {
-            background: var(--neon-primary);
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
-            color: #fff;
-        }
-
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-        }
-
-        h1 {
-            font-size: 40px;
-            font-weight: 300;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .search-bar {
-            width: 100%;
-            max-width: 800px;
-            margin-bottom: 40px;
-        }
-
-        .search-bar input {
-            width: 100%;
-            background: var(--surface-color);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px 25px;
-            border-radius: 12px;
-            font-size: 16px;
-            color: var(--text-main);
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .search-bar input:focus {
-            border-color: var(--neon-primary);
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
-        }
-
-        .catalog {
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .macro-card {
-            background: var(--surface-color);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.2s ease, border-color 0.2s ease;
-            cursor: pointer;
-        }
-
-        .macro-card:hover {
-            transform: scale(1.01);
-            border-color: var(--neon-primary);
-        }
-
-        .macro-content {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .macro-preview {
-            width: 120px;
-            height: 68px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: #000;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .macro-info {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .macro-title {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .macro-details {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .macro-details span {
-            color: var(--text-main);
-            margin-right: 15px;
-        }
-
-        .btn-download {
-            background: #2a2a2a;
-            color: var(--text-main);
-            padding: 10px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .btn-download:hover {
-            background: var(--neon-primary);
-            box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
-        }
-
-        /* МОДАЛЬНОЕ ОКНО */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        .modal-content {
-            width: 60%;
-            max-width: 1000px;
-            min-width: 320px;
-            background: var(--surface-color);
-            border: 1px solid var(--neon-primary);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-            position: relative;
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-video-container {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .modal-video-container iframe,
-        .modal-video-container img {
-            width: 100%;
-            height: 100%;
-            border: none;
-            object-fit: cover;
-        }
-
-        .modal-title-wrap {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .modal-title-text {
-            font-size: 28px;
-            font-weight: 600;
-        }
-
-        .modal-desc {
-            color: var(--text-muted);
-            font-size: 16px;
-            line-height: 1.6;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
         
-        #loader-text {
-            text-align: center;
-            color: var(--neon-primary);
-            font-size: 18px;
-            font-family: monospace;
-            margin-top: 20px;
-        }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); background: rgba(18, 18, 18, 0.7); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 24px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: text-shadow 0.3s ease; color: var(--text-main); text-decoration: none; }
+        .logo:hover { text-shadow: 0 0 15px var(--neon-primary); }
+        .nav-actions { display: flex; gap: 20px; align-items: center; }
+        .tg-link { color: var(--text-muted); text-decoration: none; transition: color 0.3s ease; }
+        .tg-link:hover { color: #0088cc; text-shadow: 0 0 10px rgba(0, 136, 204, 0.5); }
+        .btn-submit { background: transparent; color: var(--text-main); border: 1px solid var(--neon-primary); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; }
+        .btn-submit:hover { background: var(--neon-primary); box-shadow: 0 0 20px rgba(138, 43, 226, 0.4); color: #fff; }
 
-        @media (max-width: 900px) {
-            .modal-content { width: 85%; }
-        }
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+        h1 { font-size: 40px; font-weight: 300; margin-bottom: 30px; text-align: center; }
+        .search-bar { width: 100%; max-width: 800px; margin-bottom: 40px; }
+        .search-bar input { width: 100%; background: var(--surface-color); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px 25px; border-radius: 12px; font-size: 16px; color: var(--text-main); outline: none; transition: all 0.3s ease; }
+        .search-bar input:focus { border-color: var(--neon-primary); box-shadow: 0 0 20px rgba(138, 43, 226, 0.2); }
 
-        @media (max-width: 600px) {
-            .macro-content {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            .macro-preview {
-                width: 100%;
-                height: 180px;
-            }
-            .macro-card {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-            .btn-download { text-align: center; }
-            .modal-content { width: 95%; padding: 15px; }
-            .modal-title-text { font-size: 22px; }
-        }
+        .catalog { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 12px; }
+        .macro-card { background: var(--surface-color); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s ease, border-color 0.2s ease; cursor: pointer; }
+        .macro-card:hover { transform: scale(1.01); border-color: var(--neon-primary); }
+        
+        .macro-content { display: flex; align-items: center; gap: 20px; }
+        .macro-preview { width: 120px; height: 68px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1); background: #000; object-fit: cover; flex-shrink: 0; }
+        .macro-info { display: flex; flex-direction: column; gap: 6px; }
+        .macro-title { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .id-badge { font-size: 12px; font-weight: normal; font-family: monospace; color: var(--neon-cyan); background: rgba(0, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0, 255, 255, 0.2); }
+        .macro-details { font-size: 14px; color: var(--text-muted); }
+        .macro-details span { color: var(--text-main); margin-right: 15px; }
+
+        .btn-download { background: #2a2a2a; color: var(--text-main); padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.3s ease; white-space: nowrap; }
+        .btn-download:hover { background: var(--neon-primary); box-shadow: 0 0 15px rgba(138, 43, 226, 0.3); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { width: 60%; max-width: 1000px; min-width: 320px; background: var(--surface-color); border: 1px solid var(--neon-primary); border-radius: 12px; padding: 25px; box-shadow: 0 0 30px rgba(138, 43, 226, 0.2); transform: scale(0.95); transition: transform 0.3s ease; position: relative; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-video-container { width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+        .modal-video-container iframe, .modal-video-container img { width: 100%; height: 100%; border: none; object-fit: cover; }
+        .modal-title-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .modal-title-text { font-size: 28px; font-weight: 600; }
+        .modal-desc { color: var(--text-muted); font-size: 16px; line-height: 1.6; }
+        #loader-text { text-align: center; color: var(--neon-primary); font-size: 18px; font-family: monospace; margin-top: 20px; }
+
+        @media (max-width: 900px) { .modal-content { width: 85%; } }
+        @media (max-width: 600px) { .macro-content { flex-direction: column; align-items: flex-start; gap: 10px; } .macro-preview { width: 100%; height: 180px; } .macro-card { flex-direction: column; align-items: stretch; gap: 15px; } .btn-download { text-align: center; } .modal-content { width: 95%; padding: 15px; } .modal-title-text { font-size: 22px; } }
     </style>
 </head>
 <body>
@@ -322,7 +70,6 @@
         <a href="index.html" class="logo">MacroList</a>
         <div class="nav-actions">
             <a href="https://t.me/MacroList" target="_blank" class="tg-link">Telegram-канал</a>
-            <!-- Ссылка на твою Гугл Форму -->
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSck-q0EdjAkW65isqMeJOB4M8p6RAETTwwsRsftUZHTeENsmw/viewform" target="_blank" class="btn-submit">Предложить макрос</a>
         </div>
     </header>
@@ -338,24 +85,21 @@
         <div class="catalog" id="catalogContainer"></div>
     </main>
 
-    <!-- СКРЫТЫЙ БЛОК МОДАЛЬНОГО ОКНА -->
     <div class="modal-overlay" id="macroModal">
         <div class="modal-content" id="modalInner"></div>
     </div>
 
     <script>
-        // ВСТАВЬ СЮДА ССЫЛКУ НА СВОЙ СКРИПТ API (Apps Script для макросов)
+        // ВСТАВЬ СВОЮ ССЫЛКУ СЮДА И БОЛЬШЕ НИЧЕГО НЕ ТРОГАЙ
         const API_URL = "https://script.google.com/macros/s/AKfycbyXMklmFvIC0YHiOseyNcMWfoe8GA5fPeE1NsWEi5aFZxL9-xyB7zfGf37XIab1DeoO/exec";
         
-        let macrosBase = []; // Теперь это пустой массив, он заполнится из таблицы
-
+        let macrosBase = [];
         const container = document.getElementById('catalogContainer');
         const searchInput = document.getElementById('searchInput');
         const modal = document.getElementById('macroModal');
         const modalInner = document.getElementById('modalInner');
         const loader = document.getElementById('loader-text');
 
-        // Парсер ID YouTube для превью и плеера
         function getYouTubeId(url) {
             if (!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -363,19 +107,19 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        // Получаем картинку превью прямо с серверов ютуба
         function getThumbnail(url) {
             const ytId = getYouTubeId(url);
-            return ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : 'https://placeholder.co/240x136/121212/bbbbbb?text=No+Video';
+            // Если ссылки нет или она кривая, ставим серую заглушку
+            return ytId 
+                ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` 
+                : 'https://placehold.co/240x136/121212/888888?text=No+Video';
         }
 
-        // Парсер ссылок YouTube для iframe
         function getYouTubeEmbedUrl(url) {
             const ytId = getYouTubeId(url);
             return ytId ? `https://www.youtube.com/embed/${ytId}?autoplay=1` : null;
         }
 
-        // Рендер каталога
         function renderCatalog(macros) {
             container.innerHTML = ''; 
             
@@ -391,9 +135,12 @@
                 card.innerHTML = `
                     <div class="macro-content">
                         <div style="font-size: 24px; font-weight: 600; color: var(--text-muted); width: 40px; text-align: center;">#${index + 1}</div>
-                        <img src="${macro.image}" alt="Уровень ${macro.level}" class="macro-preview">
+                        <img src="${macro.image}" class="macro-preview" alt="Preview">
                         <div class="macro-info">
-                            <div class="macro-title">${macro.level}</div>
+                            <div class="macro-title">
+                                ${macro.level} 
+                                <span class="id-badge">ID: ${macro.levelId}</span>
+                            </div>
                             <div class="macro-details">
                                 Автор: <span>${macro.author}</span>
                                 Бот: <span>${macro.bot}</span>
@@ -409,7 +156,6 @@
             });
         }
 
-        // Функция открытия плашки
         function openModal(macro) {
             const embedUrl = getYouTubeEmbedUrl(macro.showcase);
             
@@ -417,69 +163,60 @@
                 ? `<iframe src="${embedUrl}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
                 : `<img src="${macro.image}" alt="${macro.level}">`;
 
-            const descText = macro.description || "Описание отсутствует.";
-
             modalInner.innerHTML = `
-                <div class="modal-video-container">
-                    ${mediaHtml}
-                </div>
+                <div class="modal-video-container">${mediaHtml}</div>
                 <div class="modal-title-wrap">
-                    <div class="modal-title-text">${macro.level}</div>
+                    <div class="modal-title-text">${macro.level} <span style="font-size: 16px; color: var(--neon-cyan);">ID: ${macro.levelId}</span></div>
                     <a href="${macro.link}" class="btn-download" target="_blank">Скачать</a>
                 </div>
-                <div class="modal-desc">${descText}</div>
+                <div class="modal-desc">${macro.description || "Описание отсутствует."}</div>
             `;
-
             modal.classList.add('active');
         }
 
-        // Закрытие плашки при клике вне её
         modal.addEventListener('click', function(e) {
-            if(e.target === this) { // Закрываем только если кликнули по фону
+            if(e.target === this) {
                 this.classList.remove('active');
                 setTimeout(() => { modalInner.innerHTML = ''; }, 300);
             }
         });
 
-        // ЗАГРУЗКА ДАННЫХ ИЗ GOOGLE ТАБЛИЦЫ
         async function fetchMacros() {
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 
-                loader.style.display = 'none'; // Прячем текст загрузки
+                if(loader) loader.style.display = 'none';
 
-                // Преобразуем данные из формата таблицы в формат карточек
                 macrosBase = data.map(item => ({
                     level: item.levelName,
+                    levelId: item.levelId,
                     author: item.author,
                     bot: item.bot,
                     fps: item.fps,
                     link: item.macroLink,
                     showcase: item.showcase,
                     description: item.description,
-                    image: getThumbnail(item.showcase) // Автоматически достаем превью!
-                })).reverse(); // Новые уровни сверху
+                    image: getThumbnail(item.showcase)
+                })).reverse();
 
                 renderCatalog(macrosBase);
             } catch (error) {
-                console.error("Ошибка при получении данных:", error);
-                loader.innerText = "ОШИБКА: НЕ УДАЛОСЬ ЗАГРУЗИТЬ БАЗУ";
-                loader.style.color = "red";
+                console.error("Ошибка:", error);
+                if(loader) { loader.innerText = "ОШИБКА: НЕ УДАЛОСЬ ЗАГРУЗИТЬ БАЗУ"; loader.style.color = "red"; }
             }
         }
 
-        // Поиск
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
             const filtered = macrosBase.filter(macro => 
                 macro.level.toLowerCase().includes(query) || 
-                macro.author.toLowerCase().includes(query)
+                macro.author.toLowerCase().includes(query) ||
+                macro.levelId.toLowerCase().includes(query)
             );
             renderCatalog(filtered);
         });
 
-        // Запуск
         fetchMacros();
     </script>
 </body>
