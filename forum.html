@@ -72,7 +72,20 @@
     <main>
         <!-- Виджет Cloudflare Turnstile -->
 <div id="captcha-container" style="display: flex; justify-content: center; margin-bottom: 20px; transition: opacity 0.5s ease;">
-    <div class="cf-turnstile" data-sitekey="0x4AAAAAAD6qfUNle89ek583" data-callback="onTurnstileSuccess"></div>
+    // Колбэк капчи (вызывается при успешной проверке)
+        function onTurnstileSuccess(token) {
+            isHumanVerified = true;
+            console.log("Проверка на человека успешно пройдена!");
+
+            // Плавно скрываем плашку
+            const container = document.getElementById('captcha-container');
+            if (container) {
+                container.style.opacity = '0';
+                setTimeout(() => {
+                    container.style.display = 'none'; // Полностью убираем из разметки через 0.5 сек
+                }, 500);
+            }
+        }
 </div>
 
         <div id="loader">УСТАНОВКА СОЕДИНЕНИЯ С СЕРВЕРОМ...</div>
