@@ -91,6 +91,54 @@
     </main>
 
     <script>
+        // Переменная статуса проверки
+        let isHumanVerified = false;
+
+        // Колбэк-функция: вызывается автоматически, когда Cloudflare проверил юзера
+        function onTurnstileSuccess(token) {
+            isHumanVerified = true;
+            console.log("Проверка на человека успешно пройдена!");
+        }
+
+        // Создание треда с двойной защитой (Кулдаун + Turnstile)
+        function createNewThread() {
+            if (!isHumanVerified) {
+                alert("ОШИБКА БЕЗОПАСНОСТИ: Пройдите проверку Cloudflare перед созданием треда!");
+                return;
+            }
+
+            const lastPost = localStorage.getItem('last_thread_create');
+            if (lastPost && (Date.now() - lastPost < 30000)) {
+                const waitSec = Math.ceil((30000 - (Date.now() - lastPost)) / 1000);
+                alert(`ПОДОЖДИТЕ ${waitSec} СЕК. ПЕРЕД СОЗДАНИЕМ НОВОГО ТРЕДА!`);
+                return;
+            }
+
+            localStorage.setItem('last_thread_create', Date.now());
+            const newThreadId = 'thread_' + Math.random().toString(36).substr(2, 6);
+            const createUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${newThreadId}`;
+            window.open(createUrl, '_blank');
+        }
+
+        // В функции openThread обнови обработчик кнопки ответа:
+        function openThread(threadId) {
+            threadsView.style.display = 'none';
+            singleThreadView.style.display = 'flex';
+            
+            const thread = forumData[threadId];
+            document.getElementById('current-thread-title').innerText = thread.title;
+            
+            document.getElementById('reply-btn').onclick = () => {
+                if (!isHumanVerified) {
+                    alert("ОШИБКА БЕЗОПАСНОСТИ: Пройдите проверку Cloudflare на главной странице перед ответом!");
+                    return;
+                }
+                const replyUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${thread.id}`;
+                window.open(replyUrl, '_blank');
+            };
+
+            // ... остальной код отрисовки постов ...
+        }
         // === ВСТАВЬ СЮДА ССЫЛКУ ИЗ GOOGLE APPS SCRIPT ===
         const API_URL = "https://script.google.com/macros/s/AKfycbwF4B2WhBFPg52nJbkoMkEdQ8rOwXNQdfTZFBs-J4mp8T6UW-iKN3uqmRusfZ_xNTDHUw/exec"; 
         
