@@ -209,21 +209,17 @@
             box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
         }
 
-        /* 
-         * ==========================================
-         * СТИЛИ ДЛЯ МОДАЛЬНОГО ОКНА (ПЛАШКИ)
-         * ==========================================
-         */
+        /* МОДАЛЬНОЕ ОКНО */
         .modal-overlay {
-            display: none; /* Скрыто по умолчанию */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85); /* Затемнение фона */
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(8px);
-            z-index: 1000; /* Поверх всего сайта */
+            z-index: 1000;
             justify-content: center;
             align-items: center;
             opacity: 0;
@@ -236,7 +232,7 @@
         }
 
         .modal-content {
-            width: 60%; /* Плашка занимает 60% экрана */
+            width: 60%;
             max-width: 1000px;
             min-width: 320px;
             background: var(--surface-color);
@@ -255,7 +251,7 @@
 
         .modal-video-container {
             width: 100%;
-            aspect-ratio: 16 / 9; /* Пропорции YouTube */
+            aspect-ratio: 16 / 9;
             background: #000;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -287,6 +283,14 @@
             font-size: 16px;
             line-height: 1.6;
         }
+        
+        #loader-text {
+            text-align: center;
+            color: var(--neon-primary);
+            font-size: 18px;
+            font-family: monospace;
+            margin-top: 20px;
+        }
 
         @media (max-width: 900px) {
             .modal-content { width: 85%; }
@@ -307,9 +311,7 @@
                 align-items: stretch;
                 gap: 15px;
             }
-            .btn-download {
-                text-align: center;
-            }
+            .btn-download { text-align: center; }
             .modal-content { width: 95%; padding: 15px; }
             .modal-title-text { font-size: 22px; }
         }
@@ -320,7 +322,8 @@
         <a href="index.html" class="logo">MacroList</a>
         <div class="nav-actions">
             <a href="https://t.me/MacroList" target="_blank" class="tg-link">Telegram-канал</a>
-            <a href="submit.html" class="btn-submit">Предложить макрос</a>
+            <!-- Ссылка на твою Гугл Форму -->
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSck-q0EdjAkW65isqMeJOB4M8p6RAETTwwsRsftUZHTeENsmw/viewform" target="_blank" class="btn-submit">Предложить макрос</a>
         </div>
     </header>
 
@@ -331,45 +334,45 @@
             <input type="text" id="searchInput" placeholder="Поиск по названию уровня или автору...">
         </div>
 
+        <div id="loader-text">Инициализация базы данных...</div>
         <div class="catalog" id="catalogContainer"></div>
     </main>
 
     <!-- СКРЫТЫЙ БЛОК МОДАЛЬНОГО ОКНА -->
     <div class="modal-overlay" id="macroModal">
-        <div class="modal-content" id="modalInner">
-            <!-- Сюда JS будет подставлять видео и текст при клике -->
-        </div>
+        <div class="modal-content" id="modalInner"></div>
     </div>
 
     <script>
+        // ВСТАВЬ СЮДА ССЫЛКУ НА СВОЙ СКРИПТ API (Apps Script для макросов)
+        const API_URL = "ВСТАВЬ_СЮДА_СВОЙ_URL";
         
-        const macrosBase = [
-            {
-                "level": "challange level", 
-                "author": "zynex", 
-                "bot": "xdBot", 
-                "fps": "240", 
-                "link": "https://drive.google.com/open?id=12F-5zew07X06rNzJnBggBU-iYZZoet9k", 
-                "showcase": "https://www.youtube.com/watch?v=bHs4SWpaweQ&t=31s", 
-                "description": "Невозможный уровень с 15 кпс геймплеем в стиле найн серклз. Скачай файл и перенеси в папку с ботом.", 
-                "image": "https://placeholder.co/240x136/121212/bbbbbb"
-            }
-        ];
+        let macrosBase = []; // Теперь это пустой массив, он заполнится из таблицы
 
         const container = document.getElementById('catalogContainer');
         const searchInput = document.getElementById('searchInput');
         const modal = document.getElementById('macroModal');
         const modalInner = document.getElementById('modalInner');
+        const loader = document.getElementById('loader-text');
 
-        // Парсер ссылок YouTube
-        function getYouTubeEmbedUrl(url) {
+        // Парсер ID YouTube для превью и плеера
+        function getYouTubeId(url) {
             if (!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             const match = url.match(regExp);
-            if (match && match[2].length === 11) {
-                return `https://www.youtube.com/embed/${match[2]}?autoplay=1`; // Добавлен autoplay, чтобы видео стартовало само
-            }
-            return null;
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Получаем картинку превью прямо с серверов ютуба
+        function getThumbnail(url) {
+            const ytId = getYouTubeId(url);
+            return ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : 'https://placeholder.co/240x136/121212/bbbbbb?text=No+Video';
+        }
+
+        // Парсер ссылок YouTube для iframe
+        function getYouTubeEmbedUrl(url) {
+            const ytId = getYouTubeId(url);
+            return ytId ? `https://www.youtube.com/embed/${ytId}?autoplay=1` : null;
         }
 
         // Рендер каталога
@@ -388,7 +391,6 @@
                 card.innerHTML = `
                     <div class="macro-content">
                         <div style="font-size: 24px; font-weight: 600; color: var(--text-muted); width: 40px; text-align: center;">#${index + 1}</div>
-                        <!-- В списке теперь только легкая картинка, чтобы сайт не лагал -->
                         <img src="${macro.image}" alt="Уровень ${macro.level}" class="macro-preview">
                         <div class="macro-info">
                             <div class="macro-title">${macro.level}</div>
@@ -402,7 +404,6 @@
                     <a href="${macro.link}" class="btn-download" target="_blank" onclick="event.stopPropagation()">Скачать</a>
                 `;
 
-                // При клике на карточку открываем плашку
                 card.addEventListener('click', () => openModal(macro));
                 container.appendChild(card);
             });
@@ -412,14 +413,12 @@
         function openModal(macro) {
             const embedUrl = getYouTubeEmbedUrl(macro.showcase);
             
-            // Если есть видео - грузим плеер, если нет - показываем картинку
             const mediaHtml = embedUrl 
                 ? `<iframe src="${embedUrl}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
                 : `<img src="${macro.image}" alt="${macro.level}">`;
 
             const descText = macro.description || "Описание отсутствует.";
 
-            // Заполняем модальное окно данными
             modalInner.innerHTML = `
                 <div class="modal-video-container">
                     ${mediaHtml}
@@ -434,26 +433,41 @@
             modal.classList.add('active');
         }
 
-        // Закрытие плашки при клике в ЛЮБОЕ место окна
+        // Закрытие плашки при клике вне её
         modal.addEventListener('click', function(e) {
-            // Убираем класс active (окно плавно исчезает)
-            this.classList.remove('active');
-            
-            // Сбрасываем внутренности через 300мс (когда закончится анимация исчезновения),
-            // чтобы видео на YouTube перестало играть в фоне!
-            setTimeout(() => {
-                modalInner.innerHTML = '';
-            }, 300);
-        });
-
-        // Блокируем закрытие плашки, если кликнули на кнопку "Скачать" внутри самой плашки
-        modalInner.addEventListener('click', function(e) {
-            if(e.target.classList.contains('btn-download')) {
-                e.stopPropagation();
+            if(e.target === this) { // Закрываем только если кликнули по фону
+                this.classList.remove('active');
+                setTimeout(() => { modalInner.innerHTML = ''; }, 300);
             }
         });
 
-        renderCatalog(macrosBase);
+        // ЗАГРУЗКА ДАННЫХ ИЗ GOOGLE ТАБЛИЦЫ
+        async function fetchMacros() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                loader.style.display = 'none'; // Прячем текст загрузки
+
+                // Преобразуем данные из формата таблицы в формат карточек
+                macrosBase = data.map(item => ({
+                    level: item.levelName,
+                    author: item.author,
+                    bot: item.bot,
+                    fps: item.fps,
+                    link: item.macroLink,
+                    showcase: item.showcase,
+                    description: item.description,
+                    image: getThumbnail(item.showcase) // Автоматически достаем превью!
+                })).reverse(); // Новые уровни сверху
+
+                renderCatalog(macrosBase);
+            } catch (error) {
+                console.error("Ошибка при получении данных:", error);
+                loader.innerText = "ОШИБКА: НЕ УДАЛОСЬ ЗАГРУЗИТЬ БАЗУ";
+                loader.style.color = "red";
+            }
+        }
 
         // Поиск
         searchInput.addEventListener('input', (e) => {
@@ -464,50 +478,9 @@
             );
             renderCatalog(filtered);
         });
-        const grid = document.getElementById('levels-wrapper');
-    const sortBtn = document.getElementById('sort-btn');
 
-    // Функция рендера (рисует то, что есть в массиве)
-    function render(data) {
-        grid.innerHTML = '';
-        data.forEach(m => {
-            const card = document.createElement('div');
-            card.className = 'level-card'; 
-            card.innerHTML = `
-                <div class="level-info-block">
-                    <div class="level-header">
-                        <div>
-                            <div class="level-name">${m.level}</div>
-                            <div class="level-author">by ${m.author}</div>
-                        </div>
-                    </div>
-                    <div class="level-meta">
-                        <div class="meta-line"><span>Bot:</span> <span>${m.bot}</span></div>
-                        <div class="meta-line"><span>FPS:</span> <span>${m.fps}</span></div>
-                    </div>
-                </div>
-                <a href="${m.link}" class="btn-download-macro">Скачать макрос</a>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    // Логика сортировки по алфавиту
-    let isSorted = false;
-    sortBtn.addEventListener('click', () => {
-        if (!isSorted) {
-            macrosBase.sort((a, b) => a.level.localeCompare(b.level));
-            sortBtn.innerText = "Сбросить сортировку";
-        } else {
-            // Можно добавить тут логику сброса в исходный порядок, 
-            // если сохранишь копию оригинального массива
-            location.reload(); // Самый простой и безопасный способ сбросить
-        }
-        render(macrosBase);
-        isSorted = !isSorted;
-    });
-
-    render(macrosBase);
+        // Запуск
+        fetchMacros();
     </script>
 </body>
 </html>
