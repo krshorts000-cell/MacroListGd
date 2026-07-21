@@ -99,6 +99,88 @@
         const threadsView = document.getElementById('threads-view');
         const singleThreadView = document.getElementById('single-thread-view');
         const loader = document.getElementById('loader');
+        // 1. Кэширование базы в память браузера (чтобы не нагружать Wi-Fi лишними запросами)
+        async function loadForum(forceReload = false) {
+            const cachedData = localStorage.getItem('forum_cache');
+            const cacheTime = localStorage.getItem('forum_cache_time');
+            
+            // Если кэш свежий (меньше 1 минуты) и мы не запрашивали принудительную перезагрузку
+            if (!forceReload && cachedData && cacheTime && (Date.now() - cacheTime < 60000)) {
+                if (loader) loader.style.display = 'none';
+                processForumData(JSON.parse(cachedData));
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                if (loader) loader.style.display = 'none';
+                
+                if (data.error) {
+                    threadsView.innerHTML = `<div style="color: red;">CRITICAL ERROR: ${data.error}</div>`;
+                    return;
+                }
+
+                // Сохраняем свежие данные в кэш
+                localStorage.setItem('forum_cache', JSON.stringify(data));
+                localStorage.setItem('forum_cache_time', Date.now());
+
+                processForumData(data);
+            } catch (err) {
+                console.error(err);
+                if (loader) {
+                    loader.innerText = "ОШИБКА ПОДКЛЮЧЕНИЯ К БАЗЕ. ДОСТУП ЗАКРЫТ.";
+                    loader.style.color = "red";
+                }
+            }
+        }
+
+        // Обработка данных
+        function processForumData(data) {
+            forumData = {};
+            data.forEach(post => {
+                if(!post.threadId) return;
+                if(!forumData[post.threadId]) {
+                    forumData[post.threadId] = {
+                        id: post.threadId,
+                        title: 'Безымянный тред',
+                        posts: [],
+                        lastUpdate: new Date(post.date).getTime()
+                    };
+                }
+                forumData[post.threadId].posts.push(post);
+                if(post.title) forumData[post.threadId].title = post.title;
+                const postTime = new Date(post.date).getTime();
+                if(postTime > forumData[post.threadId].lastUpdate) {
+                    forumData[post.threadId].lastUpdate = postTime;
+                }
+            });
+
+            renderThreadsList();
+        }
+
+        // 2. Кулдаун 30 секунд на создание треда (защита от спама)
+        function createNewThread() {
+            const lastPost = localStorage.getItem('last_thread_create');
+            if (lastPost && (Date.now() - lastPost < 30000)) {
+                const waitSec = Math.ceil((30000 - (Date.now() - lastPost)) / 1000);
+                alert(`ПОДОЖДИТЕ ${waitSec} СЕК. ПЕРЕД СОЗДАНИЕМ НОВОГО ТРЕДА!`);
+                return;
+            }
+
+            localStorage.setItem('last_thread_create', Date.now());
+            const newThreadId = 'thread_' + Math.random().toString(36).substr(2, 6);
+            const createUrl = `${FORM_BASE_URL}?${ENTRY_THREAD_ID}=${newThreadId}`;
+            window.open(createUrl, '_blank');
+        }
+
+        // 3. Возврат к списку с принудительным обновлением
+        function showThreadsList() {
+            singleThreadView.style.display = 'none';
+            threadsView.style.display = 'flex';
+            loadForum(true); // Перезагружаем с сервера при возврате
+        }
 
         // Функция парсинга и группировки
         async function loadForum() {
