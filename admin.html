@@ -6,7 +6,7 @@
   <title>Админ-панель</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e2e; color: #cdd6f4; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-    .container, .posts-container { background-color: #181825; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); width: 100%; max-width: 600px; margin-bottom: 20px; }
+    .container, .posts-container { background-color: #181825; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); width: 100%; max-width: 600px; margin-bottom: 20px; box-sizing: border-box; }
     h2 { color: #89b4fa; text-align: center; margin-top: 0; }
     label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
     input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #45475a; background-color: #313244; color: #cdd6f4; font-size: 15px; box-sizing: border-box; }
@@ -19,7 +19,7 @@
     .success { color: #a6e3a1; }
     .error { color: #f38ba8; }
     
-    /* Стили для списка постов */
+    /* Стили для карточек записей */
     .post-card { background-color: #313244; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #89b4fa; }
     .post-title { font-weight: bold; font-size: 18px; color: #f5e0dc; margin-bottom: 8px; }
     .post-body { font-size: 14px; color: #bac2de; white-space: pre-wrap; margin-bottom: 15px; }
@@ -32,43 +32,41 @@
 </head>
 <body>
 
-  <!-- ФОРМА ДОБАВЛЕНИЯ И РЕДАКТИРОВАНИЯ -->
+  <!-- ФОРМА ДОБАВЛЕНИЯ / РЕДАКТИРОВАНИЯ -->
   <div class="container">
-    <h2 id="formTitle">🚀 Добавить пост</h2>
-    <input type="hidden" id="editRowId" value=""> <!-- Здесь храним номер строки при редактировании -->
+    <h2 id="formTitle">📝 Создать новую запись</h2>
+    <input type="hidden" id="editRowId" value="">
     
-    <label>Заголовок:</label>
-    <input type="text" id="title" placeholder="Например: Arshadow поставил 69%...">
+    <label>Заголовок / Тема:</label>
+    <input type="text" id="title" placeholder="Введите заголовок...">
     
     <label>Текст сообщения:</label>
-    <textarea id="body" placeholder="Вставь сюда текст, ссылку на YouTube..."></textarea>
+    <textarea id="body" placeholder="Введите основной текст, ссылки..."></textarea>
     
     <div id="countBlock">
       <label>Сколько раз добавить в таблицу:</label>
       <input type="number" id="count" value="1" min="1">
     </div>
     
-    <button id="submitBtn" onclick="sendData()">Отправить в таблицу</button>
+    <button id="submitBtn" onclick="sendData()">Опубликовать запись</button>
     <button id="cancelEditBtn" onclick="cancelEdit()">Отменить редактирование</button>
     <div id="status"></div>
   </div>
 
-  <!-- СПИСОК ПОСТОВ -->
+  <!-- УПРАВЛЕНИЕ / МОДЕРАЦИЯ -->
   <div class="posts-container">
-    <h2>📋 Управление записями</h2>
+    <h2>📋 Управление лентой и форумом</h2>
     <button onclick="loadPosts()" style="margin-top: 0; margin-bottom: 15px; background-color: #a6e3a1;">🔄 Обновить список</button>
-    <div id="postsList">Загрузка постов...</div>
+    <div id="postsList">⏳ Загрузка записей...</div>
   </div>
 
   <script>
-    // ⚠️ ВСТАВЬ СВОЮ ССЫЛКУ /exec СЮДА ⚠️
+    // ⚠️ Твоя рабочая ссылка на Google Apps Script API
     const API_URL = "https://script.google.com/macros/s/AKfycbyEUOzz3qSGqZjPMSQPkWZY-kjJTOjD-xOLknxRxYaR0hszSI0HKLFu8rYoj1rUv-QM/exec";
-    let currentAction = "add"; // По умолчанию мы добавляем посты
+    let currentAction = "add";
 
-    // Загружаем посты при открытии страницы
     window.onload = loadPosts;
 
-    // --- ФУНКЦИЯ 1: ПОЛУЧЕНИЕ ПОСТОВ ---
     async function loadPosts() {
       const postsList = document.getElementById('postsList');
       postsList.innerHTML = "⏳ Читаю базу данных...";
@@ -79,7 +77,7 @@
         if (result.status === "success") {
           postsList.innerHTML = "";
           if (result.data.length === 0) {
-            postsList.innerHTML = "📭 Таблица пуста.";
+            postsList.innerHTML = "📭 База данных пуста.";
             return;
           }
           
@@ -103,7 +101,6 @@
       }
     }
 
-    // --- ФУНКЦИЯ 2: ОТПРАВКА ДАННЫХ (Добавление или Редактирование) ---
     async function sendData() {
       const btn = document.getElementById('submitBtn');
       const statusDiv = document.getElementById('status');
@@ -114,11 +111,11 @@
 
       if (!title) return statusDiv.innerText = '⚠️ Укажи заголовок!';
 
-      btn.innerText = '⏳ Записываю...';
+      btn.innerText = '⏳ Сохраняю...';
       btn.disabled = true;
 
       const formData = new URLSearchParams();
-      formData.append('action', currentAction); // Передаем 'add' или 'edit'
+      formData.append('action', currentAction);
       formData.append('title', title);
       formData.append('body', bodyText);
       if (currentAction === "add") formData.append('count', count);
@@ -132,36 +129,34 @@
         statusDiv.innerText = result.message;
         
         if (result.status === "success") {
-          cancelEdit(); // Сбрасываем форму
-          loadPosts();  // Обновляем список
+          cancelEdit();
+          loadPosts();
         }
       } catch (e) {
         statusDiv.className = 'error';
         statusDiv.innerText = '❌ Ошибка сети';
       } finally {
         btn.disabled = false;
-        btn.innerText = currentAction === "edit" ? "💾 Сохранить изменения" : "Отправить в таблицу";
+        btn.innerText = currentAction === "edit" ? "💾 Сохранить изменения" : "Опубликовать запись";
       }
     }
 
-    // --- ФУНКЦИЯ 3: ПОДГОТОВКА К РЕДАКТИРОВАНИЮ ---
     function startEdit(row, title, body) {
       currentAction = "edit";
       document.getElementById('editRowId').value = row;
       document.getElementById('title').value = title;
       document.getElementById('body').value = body;
       
-      document.getElementById('formTitle').innerText = "✏️ Редактирование поста (Строка " + row + ")";
+      document.getElementById('formTitle').innerText = "✏️ Редактирование записи (Строка " + row + ")";
       document.getElementById('submitBtn').innerText = "💾 Сохранить изменения";
       document.getElementById('submitBtn').style.backgroundColor = "#f9e2af";
       document.getElementById('countBlock').style.display = "none";
       document.getElementById('cancelEditBtn').style.display = "block";
       document.getElementById('status').innerText = "";
       
-      window.scrollTo(0, 0); // Прокручиваем вверх к форме
+      window.scrollTo(0, 0);
     }
 
-    // --- ФУНКЦИЯ 4: ОТМЕНА РЕДАКТИРОВАНИЯ ---
     function cancelEdit() {
       currentAction = "add";
       document.getElementById('editRowId').value = "";
@@ -169,16 +164,15 @@
       document.getElementById('body').value = "";
       document.getElementById('count').value = "1";
       
-      document.getElementById('formTitle').innerText = "🚀 Добавить пост";
-      document.getElementById('submitBtn').innerText = "Отправить в таблицу";
+      document.getElementById('formTitle').innerText = "📝 Создать новую запись";
+      document.getElementById('submitBtn').innerText = "Опубликовать запись";
       document.getElementById('submitBtn').style.backgroundColor = "#89b4fa";
       document.getElementById('countBlock').style.display = "block";
       document.getElementById('cancelEditBtn').style.display = "none";
     }
 
-    // --- ФУНКЦИЯ 5: УДАЛЕНИЕ ---
     async function deletePost(row) {
-      if (!confirm("Уверен, что хочешь удалить этот пост?")) return;
+      if (!confirm("Уверен, что хочешь удалить эту запись?")) return;
       
       const btn = document.querySelector(`#post-${row} .btn-delete`);
       btn.innerText = "⏳...";
@@ -190,7 +184,7 @@
 
       try {
         await fetch(API_URL, { method: 'POST', body: formData });
-        loadPosts(); // Перезагружаем список после удаления
+        loadPosts();
       } catch (e) {
         alert("Ошибка удаления!");
         btn.innerText = "🗑 Удалить";
@@ -198,7 +192,6 @@
       }
     }
 
-    // Утилита для экранирования кавычек при передаче в функцию
     function escapeJS(str) {
       return str.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
     }
