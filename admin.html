@@ -5,118 +5,202 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Админ-панель</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #1e1e2e;
-      color: #cdd6f4;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-    .container {
-      background-color: #181825;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-      width: 100%;
-      max-width: 500px;
-      margin-top: 20px;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e2e; color: #cdd6f4; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .container, .posts-container { background-color: #181825; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); width: 100%; max-width: 600px; margin-bottom: 20px; }
     h2 { color: #89b4fa; text-align: center; margin-top: 0; }
     label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-    input[type="text"], input[type="number"], textarea {
-      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #45475a;
-      background-color: #313244; color: #cdd6f4; font-size: 15px; box-sizing: border-box;
-    }
+    input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #45475a; background-color: #313244; color: #cdd6f4; font-size: 15px; box-sizing: border-box; }
     input:focus, textarea:focus { outline: none; border-color: #89b4fa; }
-    textarea { resize: vertical; min-height: 150px; }
-    button {
-      width: 100%; background-color: #89b4fa; color: #11111b; border: none;
-      padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold;
-      cursor: pointer; margin-top: 25px; transition: background-color 0.2s;
-    }
+    textarea { resize: vertical; min-height: 120px; }
+    button { width: 100%; background-color: #89b4fa; color: #11111b; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 25px; transition: background-color 0.2s; }
     button:hover { background-color: #b4befe; }
     button:disabled { background-color: #585b70; color: #a6adc8; cursor: not-allowed; }
     #status { margin-top: 15px; text-align: center; font-weight: bold; min-height: 20px; }
     .success { color: #a6e3a1; }
     .error { color: #f38ba8; }
+    
+    /* Стили для списка постов */
+    .post-card { background-color: #313244; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #89b4fa; }
+    .post-title { font-weight: bold; font-size: 18px; color: #f5e0dc; margin-bottom: 8px; }
+    .post-body { font-size: 14px; color: #bac2de; white-space: pre-wrap; margin-bottom: 15px; }
+    .post-meta { font-size: 12px; color: #6c7086; margin-bottom: 10px; }
+    .btn-group { display: flex; gap: 10px; }
+    .btn-edit { background-color: #f9e2af; padding: 8px; margin-top: 0; font-size: 14px; }
+    .btn-delete { background-color: #f38ba8; padding: 8px; margin-top: 0; font-size: 14px; }
+    #cancelEditBtn { background-color: #f38ba8; display: none; margin-top: 10px; }
   </style>
 </head>
 <body>
+
+  <!-- ФОРМА ДОБАВЛЕНИЯ И РЕДАКТИРОВАНИЯ -->
   <div class="container">
-    <h2>🚀 Админ-панель базы</h2>
+    <h2 id="formTitle">🚀 Добавить пост</h2>
+    <input type="hidden" id="editRowId" value=""> <!-- Здесь храним номер строки при редактировании -->
     
-    <label>Заголовок (1-я строка):</label>
+    <label>Заголовок:</label>
     <input type="text" id="title" placeholder="Например: Arshadow поставил 69%...">
     
-    <label>Основной текст (Ссылки, эмодзи, всё что угодно):</label>
-    <textarea id="body" placeholder="Вставь сюда текст, ссылку на YouTube и т.д."></textarea>
+    <label>Текст сообщения:</label>
+    <textarea id="body" placeholder="Вставь сюда текст, ссылку на YouTube..."></textarea>
     
-    <label>Количество записей в таблицу:</label>
-    <input type="number" id="count" value="1" min="1">
+    <div id="countBlock">
+      <label>Сколько раз добавить в таблицу:</label>
+      <input type="number" id="count" value="1" min="1">
+    </div>
     
     <button id="submitBtn" onclick="sendData()">Отправить в таблицу</button>
+    <button id="cancelEditBtn" onclick="cancelEdit()">Отменить редактирование</button>
     <div id="status"></div>
   </div>
 
-  <script>
-    // СЮДА ВСТАВЬ СВОЮ ССЫЛКУ /exec ИЗ GOOGLE APPS SCRIPT
-    const API_URL = "https://script.google.com/macros/s/AKfycbwru-oR4ssseda2ev5tfkoc9apjZU6TxXsUD0QbUEEZa9wHGAjslM_QJpVUcbBmrRdz/exec";
+  <!-- СПИСОК ПОСТОВ -->
+  <div class="posts-container">
+    <h2>📋 Управление записями</h2>
+    <button onclick="loadPosts()" style="margin-top: 0; margin-bottom: 15px; background-color: #a6e3a1;">🔄 Обновить список</button>
+    <div id="postsList">Загрузка постов...</div>
+  </div>
 
+  <script>
+    // ⚠️ ВСТАВЬ СВОЮ ССЫЛКУ /exec СЮДА ⚠️
+    const API_URL = "ТВОЯ_ССЫЛКА_EXEC_СЮДА";
+    let currentAction = "add"; // По умолчанию мы добавляем посты
+
+    // Загружаем посты при открытии страницы
+    window.onload = loadPosts;
+
+    // --- ФУНКЦИЯ 1: ПОЛУЧЕНИЕ ПОСТОВ ---
+    async function loadPosts() {
+      const postsList = document.getElementById('postsList');
+      postsList.innerHTML = "⏳ Читаю базу данных...";
+      try {
+        const response = await fetch(API_URL);
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          postsList.innerHTML = "";
+          if (result.data.length === 0) {
+            postsList.innerHTML = "📭 Таблица пуста.";
+            return;
+          }
+          
+          result.data.forEach(post => {
+            const dateStr = new Date(post.date).toLocaleString('ru-RU');
+            postsList.innerHTML += `
+              <div class="post-card" id="post-${post.row}">
+                <div class="post-meta">Строка в таблице: ${post.row} | 🕒 ${dateStr}</div>
+                <div class="post-title">${post.title}</div>
+                <div class="post-body">${post.body}</div>
+                <div class="btn-group">
+                  <button class="btn-edit" onclick="startEdit(${post.row}, '${escapeJS(post.title)}', '${escapeJS(post.body)}')">✏️ Изменить</button>
+                  <button class="btn-delete" onclick="deletePost(${post.row})">🗑 Удалить</button>
+                </div>
+              </div>
+            `;
+          });
+        }
+      } catch (e) {
+        postsList.innerHTML = "❌ Ошибка загрузки постов.";
+      }
+    }
+
+    // --- ФУНКЦИЯ 2: ОТПРАВКА ДАННЫХ (Добавление или Редактирование) ---
     async function sendData() {
       const btn = document.getElementById('submitBtn');
       const statusDiv = document.getElementById('status');
       const title = document.getElementById('title').value.trim();
       const bodyText = document.getElementById('body').value.trim();
-      const count = parseInt(document.getElementById('count').value) || 1;
+      const count = document.getElementById('count').value;
+      const rowId = document.getElementById('editRowId').value;
 
-      statusDiv.innerText = '';
-      statusDiv.className = '';
-
-      if (!title) {
-        statusDiv.innerText = '⚠️ Укажи хотя бы заголовок!';
-        statusDiv.className = 'error';
-        return;
-      }
+      if (!title) return statusDiv.innerText = '⚠️ Укажи заголовок!';
 
       btn.innerText = '⏳ Записываю...';
       btn.disabled = true;
 
-      // Упаковываем данные для безопасной отправки
       const formData = new URLSearchParams();
+      formData.append('action', currentAction); // Передаем 'add' или 'edit'
       formData.append('title', title);
       formData.append('body', bodyText);
-      formData.append('count', count);
+      if (currentAction === "add") formData.append('count', count);
+      if (currentAction === "edit") formData.append('row', rowId);
 
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: formData
-        });
-        
+        const response = await fetch(API_URL, { method: 'POST', body: formData });
         const result = await response.json();
-
+        
+        statusDiv.className = result.status === "success" ? 'success' : 'error';
+        statusDiv.innerText = result.message;
+        
         if (result.status === "success") {
-          statusDiv.className = 'success';
-          statusDiv.innerText = result.message;
-          // Очищаем форму после успешной отправки
-          document.getElementById('title').value = '';
-          document.getElementById('body').value = '';
-          document.getElementById('count').value = '1';
-        } else {
-          statusDiv.className = 'error';
-          statusDiv.innerText = result.message;
+          cancelEdit(); // Сбрасываем форму
+          loadPosts();  // Обновляем список
         }
-      } catch (error) {
+      } catch (e) {
         statusDiv.className = 'error';
-        statusDiv.innerText = '❌ Ошибка сети: не удалось связаться с таблицей.';
+        statusDiv.innerText = '❌ Ошибка сети';
       } finally {
-        btn.innerText = 'Отправить в таблицу';
+        btn.disabled = false;
+        btn.innerText = currentAction === "edit" ? "💾 Сохранить изменения" : "Отправить в таблицу";
+      }
+    }
+
+    // --- ФУНКЦИЯ 3: ПОДГОТОВКА К РЕДАКТИРОВАНИЮ ---
+    function startEdit(row, title, body) {
+      currentAction = "edit";
+      document.getElementById('editRowId').value = row;
+      document.getElementById('title').value = title;
+      document.getElementById('body').value = body;
+      
+      document.getElementById('formTitle').innerText = "✏️ Редактирование поста (Строка " + row + ")";
+      document.getElementById('submitBtn').innerText = "💾 Сохранить изменения";
+      document.getElementById('submitBtn').style.backgroundColor = "#f9e2af";
+      document.getElementById('countBlock').style.display = "none";
+      document.getElementById('cancelEditBtn').style.display = "block";
+      document.getElementById('status').innerText = "";
+      
+      window.scrollTo(0, 0); // Прокручиваем вверх к форме
+    }
+
+    // --- ФУНКЦИЯ 4: ОТМЕНА РЕДАКТИРОВАНИЯ ---
+    function cancelEdit() {
+      currentAction = "add";
+      document.getElementById('editRowId').value = "";
+      document.getElementById('title').value = "";
+      document.getElementById('body').value = "";
+      document.getElementById('count').value = "1";
+      
+      document.getElementById('formTitle').innerText = "🚀 Добавить пост";
+      document.getElementById('submitBtn').innerText = "Отправить в таблицу";
+      document.getElementById('submitBtn').style.backgroundColor = "#89b4fa";
+      document.getElementById('countBlock').style.display = "block";
+      document.getElementById('cancelEditBtn').style.display = "none";
+    }
+
+    // --- ФУНКЦИЯ 5: УДАЛЕНИЕ ---
+    async function deletePost(row) {
+      if (!confirm("Уверен, что хочешь удалить этот пост?")) return;
+      
+      const btn = document.querySelector(`#post-${row} .btn-delete`);
+      btn.innerText = "⏳...";
+      btn.disabled = true;
+
+      const formData = new URLSearchParams();
+      formData.append('action', 'delete');
+      formData.append('row', row);
+
+      try {
+        await fetch(API_URL, { method: 'POST', body: formData });
+        loadPosts(); // Перезагружаем список после удаления
+      } catch (e) {
+        alert("Ошибка удаления!");
+        btn.innerText = "🗑 Удалить";
         btn.disabled = false;
       }
+    }
+
+    // Утилита для экранирования кавычек при передаче в функцию
+    function escapeJS(str) {
+      return str.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
     }
   </script>
 </body>
