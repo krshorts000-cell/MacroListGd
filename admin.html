@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Админ-панель</title>
+  <title>Модерация форума</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e2e; color: #cdd6f4; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
     .container, .posts-container { background-color: #181825; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); width: 100%; max-width: 600px; margin-bottom: 20px; box-sizing: border-box; }
     h2 { color: #89b4fa; text-align: center; margin-top: 0; }
     label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-    input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #45475a; background-color: #313244; color: #cdd6f4; font-size: 15px; box-sizing: border-box; }
+    input[type="text"], textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #45475a; background-color: #313244; color: #cdd6f4; font-size: 15px; box-sizing: border-box; }
     input:focus, textarea:focus { outline: none; border-color: #89b4fa; }
     textarea { resize: vertical; min-height: 120px; }
     button { width: 100%; background-color: #89b4fa; color: #11111b; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 25px; transition: background-color 0.2s; }
@@ -19,11 +19,11 @@
     .success { color: #a6e3a1; }
     .error { color: #f38ba8; }
     
-    /* Стили для карточек записей */
+    /* Стили карточек */
     .post-card { background-color: #313244; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #89b4fa; }
-    .post-title { font-weight: bold; font-size: 18px; color: #f5e0dc; margin-bottom: 8px; }
-    .post-body { font-size: 14px; color: #bac2de; white-space: pre-wrap; margin-bottom: 15px; }
-    .post-meta { font-size: 12px; color: #6c7086; margin-bottom: 10px; }
+    .thread-badge { font-size: 12px; background-color: #45475a; color: #fab387; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; font-weight: bold; }
+    .post-body { font-size: 15px; color: #cdd6f4; white-space: pre-wrap; margin-bottom: 15px; }
+    .post-meta { font-size: 12px; color: #6c7086; margin-bottom: 5px; }
     .btn-group { display: flex; gap: 10px; }
     .btn-edit { background-color: #f9e2af; padding: 8px; margin-top: 0; font-size: 14px; }
     .btn-delete { background-color: #f38ba8; padding: 8px; margin-top: 0; font-size: 14px; }
@@ -32,36 +32,31 @@
 </head>
 <body>
 
-  <!-- ФОРМА ДОБАВЛЕНИЯ / РЕДАКТИРОВАНИЯ -->
+  <!-- ФОРМА ОТПРАВКИ -->
   <div class="container">
-    <h2 id="formTitle">📝 Создать новую запись</h2>
+    <h2 id="formTitle">💬 Написать от админа</h2>
     <input type="hidden" id="editRowId" value="">
     
-    <label>Заголовок / Тема:</label>
-    <input type="text" id="title" placeholder="Введите заголовок...">
+    <label>Заголовок треда:</label>
+    <input type="text" id="threadTitle" placeholder="Например: Первый тред">
     
     <label>Текст сообщения:</label>
-    <textarea id="body" placeholder="Введите основной текст, ссылки..."></textarea>
+    <textarea id="message" placeholder="Введите текст сообщения..."></textarea>
     
-    <div id="countBlock">
-      <label>Сколько раз добавить в таблицу:</label>
-      <input type="number" id="count" value="1" min="1">
-    </div>
-    
-    <button id="submitBtn" onclick="sendData()">Опубликовать запись</button>
+    <button id="submitBtn" onclick="sendData()">Отправить в тред</button>
     <button id="cancelEditBtn" onclick="cancelEdit()">Отменить редактирование</button>
     <div id="status"></div>
   </div>
 
-  <!-- УПРАВЛЕНИЕ / МОДЕРАЦИЯ -->
+  <!-- МОДЕРАЦИЯ СООБЩЕНИЙ -->
   <div class="posts-container">
-    <h2>📋 Управление лентой и форумом</h2>
+    <h2>📋 Сообщения форума</h2>
     <button onclick="loadPosts()" style="margin-top: 0; margin-bottom: 15px; background-color: #a6e3a1;">🔄 Обновить список</button>
-    <div id="postsList">⏳ Загрузка записей...</div>
+    <div id="postsList">⏳ Загрузка сообщений...</div>
   </div>
 
   <script>
-    // ⚠️ Твоя рабочая ссылка на Google Apps Script API
+    // ⚠️ Вставь свою актуальную ссылку /exec сюда
     const API_URL = "https://script.google.com/macros/s/AKfycbyEUOzz3qSGqZjPMSQPkWZY-kjJTOjD-xOLknxRxYaR0hszSI0HKLFu8rYoj1rUv-QM/exec";
     let currentAction = "add";
 
@@ -77,7 +72,7 @@
         if (result.status === "success") {
           postsList.innerHTML = "";
           if (result.data.length === 0) {
-            postsList.innerHTML = "📭 База данных пуста.";
+            postsList.innerHTML = "📭 Сообщений пока нет.";
             return;
           }
           
@@ -85,11 +80,11 @@
             const dateStr = new Date(post.date).toLocaleString('ru-RU');
             postsList.innerHTML += `
               <div class="post-card" id="post-${post.row}">
+                <div class="thread-badge">📁 Тред: ${post.threadTitle}</div>
                 <div class="post-meta">Строка в таблице: ${post.row} | 🕒 ${dateStr}</div>
-                <div class="post-title">${post.title}</div>
-                <div class="post-body">${post.body}</div>
+                <div class="post-body">${post.message}</div>
                 <div class="btn-group">
-                  <button class="btn-edit" onclick="startEdit(${post.row}, '${escapeJS(post.title)}', '${escapeJS(post.body)}')">✏️ Изменить</button>
+                  <button class="btn-edit" onclick="startEdit(${post.row}, '${escapeJS(post.threadTitle)}', '${escapeJS(post.message)}')">✏️ Изменить</button>
                   <button class="btn-delete" onclick="deletePost(${post.row})">🗑 Удалить</button>
                 </div>
               </div>
@@ -97,28 +92,26 @@
           });
         }
       } catch (e) {
-        postsList.innerHTML = "❌ Ошибка загрузки постов.";
+        postsList.innerHTML = "❌ Ошибка загрузки сообщений.";
       }
     }
 
     async function sendData() {
       const btn = document.getElementById('submitBtn');
       const statusDiv = document.getElementById('status');
-      const title = document.getElementById('title').value.trim();
-      const bodyText = document.getElementById('body').value.trim();
-      const count = document.getElementById('count').value;
+      const threadTitle = document.getElementById('threadTitle').value.trim();
+      const message = document.getElementById('message').value.trim();
       const rowId = document.getElementById('editRowId').value;
 
-      if (!title) return statusDiv.innerText = '⚠️ Укажи заголовок!';
+      if (!threadTitle || !message) return statusDiv.innerText = '⚠️ Заполни заголовок треда и сообщение!';
 
       btn.innerText = '⏳ Сохраняю...';
       btn.disabled = true;
 
       const formData = new URLSearchParams();
       formData.append('action', currentAction);
-      formData.append('title', title);
-      formData.append('body', bodyText);
-      if (currentAction === "add") formData.append('count', count);
+      formData.append('threadTitle', threadTitle);
+      formData.append('message', message);
       if (currentAction === "edit") formData.append('row', rowId);
 
       try {
@@ -137,20 +130,19 @@
         statusDiv.innerText = '❌ Ошибка сети';
       } finally {
         btn.disabled = false;
-        btn.innerText = currentAction === "edit" ? "💾 Сохранить изменения" : "Опубликовать запись";
+        btn.innerText = currentAction === "edit" ? "💾 Сохранить изменения" : "Отправить в тред";
       }
     }
 
-    function startEdit(row, title, body) {
+    function startEdit(row, threadTitle, message) {
       currentAction = "edit";
       document.getElementById('editRowId').value = row;
-      document.getElementById('title').value = title;
-      document.getElementById('body').value = body;
+      document.getElementById('threadTitle').value = threadTitle;
+      document.getElementById('message').value = message;
       
-      document.getElementById('formTitle').innerText = "✏️ Редактирование записи (Строка " + row + ")";
+      document.getElementById('formTitle').innerText = "✏️ Редактирование сообщения (Строка " + row + ")";
       document.getElementById('submitBtn').innerText = "💾 Сохранить изменения";
       document.getElementById('submitBtn').style.backgroundColor = "#f9e2af";
-      document.getElementById('countBlock').style.display = "none";
       document.getElementById('cancelEditBtn').style.display = "block";
       document.getElementById('status').innerText = "";
       
@@ -159,20 +151,18 @@
 
     function cancelEdit() {
       currentAction = "add";
-      document.getElementById('editRowId').value = "";
-      document.getElementById('title').value = "";
-      document.getElementById('body').value = "";
-      document.getElementById('count').value = "1";
+      document.getElementById('editRowId').value = rowId = "";
+      document.getElementById('threadTitle').value = "";
+      document.getElementById('message').value = "";
       
-      document.getElementById('formTitle').innerText = "📝 Создать новую запись";
-      document.getElementById('submitBtn').innerText = "Опубликовать запись";
+      document.getElementById('formTitle').innerText = "💬 Написать от админа";
+      document.getElementById('submitBtn').innerText = "Отправить в тред";
       document.getElementById('submitBtn').style.backgroundColor = "#89b4fa";
-      document.getElementById('countBlock').style.display = "block";
       document.getElementById('cancelEditBtn').style.display = "none";
     }
 
     async function deletePost(row) {
-      if (!confirm("Уверен, что хочешь удалить эту запись?")) return;
+      if (!confirm("Уверен, что хочешь удалить это сообщение?")) return;
       
       const btn = document.querySelector(`#post-${row} .btn-delete`);
       btn.innerText = "⏳...";
