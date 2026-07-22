@@ -15,6 +15,7 @@
             --text-muted: #9999a3;
             --neon-primary: #8a2be2; /* Фиолетовый неон */
             --neon-cyan: #00f0ff;    /* Голубой неон */
+            --neon-news: #ffaa00;    /* Золотой/Оранжевый неон для новостей */
             --neon-danger: #ff2a2a;  /* Красный для баннера */
             --border-glow: rgba(138, 43, 226, 0.15);
         }
@@ -152,11 +153,12 @@
             box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
         }
 
-        /* Контейнер для двух неоновых кнопок */
+        /* Контейнер для неоновых кнопок */
         .categories {
             display: flex;
+            flex-wrap: wrap; /* Позволяет карточкам переноситься на мобилках */
             gap: 30px;
-            max-width: 900px;
+            max-width: 1200px; /* Расширили чтобы влезли 3 карточки в один ряд на ПК */
             width: 100%;
             margin: 20px auto;
             padding: 0 20px;
@@ -211,6 +213,10 @@
         .card.forum-btn {
             border-bottom: 2px solid rgba(138, 43, 226, 0.4);
         }
+        
+        .card.news-btn {
+            border-bottom: 2px solid rgba(255, 170, 0, 0.4);
+        }
 
         /* Анимация карточек при наведении */
         .card.catalog-btn:hover {
@@ -225,6 +231,13 @@
             border-color: var(--neon-primary);
             box-shadow: 0 0 30px rgba(138, 43, 226, 0.35),
                         inset 0 0 15px rgba(138, 43, 226, 0.15);
+        }
+
+        .card.news-btn:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-news);
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.25),
+                        inset 0 0 15px rgba(255, 170, 0, 0.1);
         }
 
         /* Текст внутри карточек */
@@ -245,6 +258,10 @@
         .card.forum-btn:hover .macro-title {
             text-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
         }
+        
+        .card.news-btn:hover .macro-title {
+            text-shadow: 0 0 10px rgba(255, 170, 0, 0.8);
+        }
 
         .macro-details {
             font-size: 14px;
@@ -254,12 +271,15 @@
 
         /* Адаптивность под мобилки */
         @media (max-width: 768px) {
-            .categories {
-                flex-direction: column;
-                gap: 20px;
-            }
             header {
                 padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .nav-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
             }
             h1 {
                 font-size: 36px;
@@ -274,7 +294,6 @@
         <div class="nav-actions">
             <a href="index.html" class="nav-link">Каталог</a>
             <a href="forum.html" class="nav-link">Обсуждение</a>
-            <!-- Оставил вкладку Новостей -->
             <a href="news.html" class="nav-link">Новости</a>
             <a href="download.html" class="nav-link">Скачать xdBot</a>
             <a href="submit.html" class="btn-submit">Предложить макрос</a>
@@ -306,6 +325,16 @@
                     <div class="macro-title">Форум сообщества</div>
                     <div class="macro-details">
                         Живое общение с игроками, обсуждение механик, помощь по настройке ботов и трекер обновлений.
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Кнопка 3: Новости проекта (Оранжевый неон) -->
+            <a href="news.html" class="card news-btn">
+                <div class="macro-info">
+                    <div class="macro-title">Новости проекта</div>
+                    <div class="macro-details">
+                        Последние обновления базы, анонсы новых функций и важные события нашего сообщества.
                     </div>
                 </div>
             </a>
