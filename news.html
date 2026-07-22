@@ -36,18 +36,16 @@
         }
 
         /* === ШАПКА / НАВИГАЦИЯ (как на скриншоте) === */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24px 40px;
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--card-border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        <header>
+    <a href="index.html" class="logo">MACROLIST</a>
+    <div class="nav-links">
+        <a href="index.html">Каталог</a>
+        <a href="forum.html">Обсуждение</a>
+        <a href="news.html" class="active">Новости</a>
+        <a href="download.html">Скачать xdBot</a>
+        <a href="submit.html" class="btn-outline">Предложить макрос</a>
+    </div>
+</header>
 
         .logo {
             font-size: 24px;
