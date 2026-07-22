@@ -35,17 +35,19 @@
             overflow-x: hidden;
         }
 
-        /* === ШАПКА / НАВИГАЦИЯ (как на скриншоте) === */
-        <header>
-    <a href="index.html" class="logo">MACROLIST</a>
-    <div class="nav-links">
-        <a href="index.html">Каталог</a>
-        <a href="forum.html">Обсуждение</a>
-        <a href="news.html" class="active">Новости</a>
-        <a href="download.html">Скачать xdBot</a>
-        <a href="submit.html" class="btn-outline">Предложить макрос</a>
-    </div>
-</header>
+        /* === ШАПКА / НАВИГАЦИЯ === */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 40px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
         .logo {
             font-size: 24px;
@@ -201,15 +203,15 @@
 </head>
 <body>
 
-    <!-- ШАПКА (Стиль скопирован с главной страницы) -->
+    <!-- ШАПКА -->
     <header>
         <a href="index.html" class="logo">MACROLIST</a>
         <div class="nav-links">
             <a href="index.html">Каталог</a>
             <a href="forum.html">Обсуждение</a>
             <a href="news.html" class="active">Новости</a>
-            <a href="#">Скачать xdBot</a>
-            <a href="#" class="btn-outline">Предложить макрос</a>
+            <a href="download.html">Скачать xdBot</a>
+            <a href="submit.html" class="btn-outline">Предложить макрос</a>
         </div>
     </header>
 
@@ -221,10 +223,8 @@
     </main>
 
     <script>
-        // ТВОЯ НОВАЯ ССЫЛКА НА GOOGLE APPS SCRIPT
         const NEWS_API_URL = "https://script.google.com/macros/s/AKfycbyKX4AqS-7mubbCqapGQsSLme2Fj5WuSotTBtwZDae1bh6nusEkFdvF0TpuP6TspMEUAQ/exec";
 
-        // Функция определения стиля тега по тексту
         function getTagClass(category) {
             const catLower = (category || '').toLowerCase();
             if (catLower.includes('update') || catLower.includes('обновлен')) return 'tag-update';
@@ -243,7 +243,6 @@
 
                 loader.style.display = 'none';
 
-                // Если таблица пустая или вернулась ошибка
                 if (!newsList || newsList.length === 0 || newsList.error) {
                     container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px; background: var(--card-bg); border-radius: 16px; border: 1px dashed var(--card-border);">
                         ${newsList.error ? 'Ошибка сервера: ' + newsList.error : 'Лента новостей пока пуста.'}
@@ -251,18 +250,15 @@
                     return;
                 }
 
-                // Рендер карточек
                 newsList.forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'news-card';
                     
-                    // Форматируем дату в удобный вид
                     const dateObj = new Date(item.date);
                     const dateStr = !isNaN(dateObj) ? dateObj.toLocaleDateString('ru-RU', {
                         day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit'
                     }) : 'Неизвестная дата';
 
-                    // Получаем CSS класс для цвета тега
                     const tagClass = getTagClass(item.category);
                     const categoryText = item.category ? item.category.replace(/\[|\]/g, '') : 'НОВОСТЬ';
 
@@ -284,7 +280,6 @@
             }
         }
 
-        // Запускаем парсинг при открытии страницы
         loadNews();
     </script>
 </body>
