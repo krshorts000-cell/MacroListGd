@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacroList | База макросов Geometry Dash</title>
     
-    <!-- Скрипт Turnstile подключен корректно в head -->
+    <!-- Скрипт Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     
     <style>
@@ -20,7 +20,7 @@
             --neon-primary: #8a2be2;
             --neon-cyan: #00f0ff;
             --neon-news: #ffaa00;
-            --neon-danger: #ff2a2a;
+            --term-cyan: #00f0ff;
             --border-glow: rgba(138, 43, 226, 0.15);
         }
 
@@ -102,7 +102,6 @@
             color: #fff;
         }
 
-        /* Кнопка Newgrounds */
         .btn-newgrounds {
             background: transparent;
             color: #fca311;
@@ -177,7 +176,6 @@
             text-decoration: none;
             background: var(--card-bg);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.03);
             border-radius: 16px;
             padding: 30px;
@@ -242,7 +240,6 @@
 
         .macro-details { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
 
-        /* Секция случайных элементов */
         .random-section { margin-top: 60px; width: 100%; max-width: 1200px; }
         .random-section h2 { font-size: 28px; font-weight: 300; margin-bottom: 30px; text-align: center; color: var(--text-main); }
         .random-grid { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
@@ -285,12 +282,12 @@
         z-index: 9999;
         transition: opacity 0.5s ease, visibility 0.5s;
     ">
-        <div style="color: var(--neon-cyan); font-size: 18px; margin-bottom: 20px; text-shadow: 0 0 10px var(--neon-cyan);">
+        <div style="color: var(--term-cyan); font-size: 18px; margin-bottom: 20px; text-shadow: 0 0 10px var(--term-cyan);">
             [!] ТЕРМИНАЛ ЗАБЛОКИРОВАН. ПРОЙДИТЕ ПРОВЕРКУ БЕЗОПАСНОСТИ
         </div>
         
-        <!-- Сама капча -->
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAAD6qfRZS8TyAdN8iGM2yPx3A4b4" data-callback="onTurnstileSuccess"></div>
+        <!-- ВСТАВЛЕН ПРАВИЛЬНЫЙ SITE KEY ИЗ FORUM.HTML -->
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAD6qfUNle89ek583" data-callback="onTurnstileSuccess"></div>
     </div>
 
     <header>
@@ -336,13 +333,12 @@
         <div class="random-section">
             <h2>Случайное из базы</h2>
             <div class="random-grid" id="random-container">
-                <p style="color: var(--text-muted);">Ожидание верификации...</p>
+                <p style="color: var(--text-muted);">Загрузка данных...</p>
             </div>
         </div>
     </main>
 
     <script>
-        // Глобальная функция для капчи ДОЛЖНА БЫТЬ ОБЪЯВЛЕНА ДО ТОГО как Cloudflare её вызовет
         let isHumanVerified = false;
 
         function onTurnstileSuccess(token) {
@@ -354,8 +350,6 @@
                 overlay.style.opacity = '0';
                 setTimeout(() => { 
                     overlay.style.display = 'none'; 
-                    // Начинаем загрузку контента только после успешного прохождения проверки
-                    loadRandomPicks();
                 }, 500);
             }
         }
@@ -384,11 +378,7 @@
         }
 
         async function loadRandomPicks() {
-            // Дополнительная проверка на случай прямого вызова
-            if (!isHumanVerified) return;
-
             const container = document.getElementById('random-container');
-            container.innerHTML = '<p style="color: var(--text-muted);">Загрузка данных...</p>';
 
             const [newsItem, forumItem, macroItem] = await Promise.all([
                 fetchRandomItem(NEWS_API, "Новость"),
@@ -422,6 +412,8 @@
                 container.innerHTML = "<p style='color: var(--text-muted);'>Базы данных пока пусты.</p>";
             }
         }
+
+        window.addEventListener('DOMContentLoaded', loadRandomPicks);
     </script>
 </body>
 </html>
