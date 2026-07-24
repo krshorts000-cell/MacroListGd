@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacroList | База макросов Geometry Dash</title>
+    
+    <!-- Скрипт Turnstile подключен корректно в head -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
@@ -13,10 +17,10 @@
             --card-bg: rgba(18, 18, 18, 0.65);
             --text-main: #f5f5f7;
             --text-muted: #9999a3;
-            --neon-primary: #8a2be2; /* Фиолетовый неон */
-            --neon-cyan: #00f0ff;    /* Голубой неон */
-            --neon-news: #ffaa00;    /* Золотой/Оранжевый неон для новостей */
-            --neon-danger: #ff2a2a;  /* Красный для баннера */
+            --neon-primary: #8a2be2;
+            --neon-cyan: #00f0ff;
+            --neon-news: #ffaa00;
+            --neon-danger: #ff2a2a;
             --border-glow: rgba(138, 43, 226, 0.15);
         }
 
@@ -35,7 +39,6 @@
             min-height: 100vh;
         }
 
-        /* Навигация (Шапка) */
         header {
             display: flex;
             justify-content: space-between;
@@ -99,7 +102,23 @@
             color: #fff;
         }
 
-        /* Главный экран */
+        /* Кнопка Newgrounds */
+        .btn-newgrounds {
+            background: transparent;
+            color: #fca311;
+            border: 1px solid #fca311;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-newgrounds:hover {
+            background: rgba(252, 163, 17, 0.1);
+            box-shadow: 0 0 15px rgba(252, 163, 17, 0.4);
+        }
+
         main {
             flex: 1;
             display: flex;
@@ -110,25 +129,12 @@
             text-align: center;
         }
 
-        /* Кликбейтный баннер */
-        .news-badge {
-            background: rgba(255, 42, 42, 0.1);
-            border: 1px solid rgba(255, 42, 42, 0.3);
-            color: var(--neon-danger);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 10px rgba(255, 42, 42, 0.2);
-        }
-
         h1 {
             font-size: 48px;
             font-weight: 300;
             margin-bottom: 40px;
         }
 
-        /* Поисковая строка */
         .search-bar {
             width: 100%;
             max-width: 600px;
@@ -153,12 +159,11 @@
             box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
         }
 
-        /* Контейнер для неоновых кнопок */
         .categories {
             display: flex;
-            flex-wrap: wrap; /* Позволяет карточкам переноситься на мобилках */
+            flex-wrap: wrap;
             gap: 30px;
-            max-width: 1200px; /* Расширили чтобы влезли 3 карточки в один ряд на ПК */
+            max-width: 1200px;
             width: 100%;
             margin: 20px auto;
             padding: 0 20px;
@@ -166,7 +171,6 @@
             justify-content: center;
         }
 
-        /* Общий стиль для неоновых карточек-кнопок */
         .card {
             flex: 1;
             min-width: 280px;
@@ -181,14 +185,12 @@
             overflow: hidden;
             text-align: left;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 
-                        inset 0 0 20px 0 var(--border-glow);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 20px 0 var(--border-glow);
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        /* Псевдоэлемент для эффекта лазерного свечения при ховере */
         .card::before {
             content: '';
             position: absolute;
@@ -201,46 +203,30 @@
             transition: transform 0.6s ease;
         }
 
-        .card:hover::before {
-            transform: translateX(100%);
-        }
+        .card:hover::before { transform: translateX(100%); }
 
-        /* Специфичные неоновые рамки снизу */
-        .card.catalog-btn {
-            border-bottom: 2px solid rgba(0, 240, 255, 0.4);
-        }
+        .card.catalog-btn { border-bottom: 2px solid rgba(0, 240, 255, 0.4); }
+        .card.forum-btn { border-bottom: 2px solid rgba(138, 43, 226, 0.4); }
+        .card.news-btn { border-bottom: 2px solid rgba(255, 170, 0, 0.4); }
 
-        .card.forum-btn {
-            border-bottom: 2px solid rgba(138, 43, 226, 0.4);
-        }
-        
-        .card.news-btn {
-            border-bottom: 2px solid rgba(255, 170, 0, 0.4);
-        }
-
-        /* Анимация карточек при наведении */
         .card.catalog-btn:hover {
             transform: translateY(-5px);
             border-color: var(--neon-cyan);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.25),
-                        inset 0 0 15px rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.25), inset 0 0 15px rgba(0, 240, 255, 0.1);
         }
 
         .card.forum-btn:hover {
             transform: translateY(-5px);
             border-color: var(--neon-primary);
-            box-shadow: 0 0 30px rgba(138, 43, 226, 0.35),
-                        inset 0 0 15px rgba(138, 43, 226, 0.15);
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.35), inset 0 0 15px rgba(138, 43, 226, 0.15);
         }
 
         .card.news-btn:hover {
             transform: translateY(-5px);
             border-color: var(--neon-news);
-            box-shadow: 0 0 30px rgba(255, 170, 0, 0.25),
-                        inset 0 0 15px rgba(255, 170, 0, 0.1);
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.25), inset 0 0 15px rgba(255, 170, 0, 0.1);
         }
 
-        /* Текст внутри карточек */
         .macro-title {
             font-size: 24px;
             font-weight: 600;
@@ -250,44 +236,62 @@
             transition: text-shadow 0.3s ease;
         }
 
-        /* Подсветка текста при ховере */
-        .card.catalog-btn:hover .macro-title {
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
-        }
+        .card.catalog-btn:hover .macro-title { text-shadow: 0 0 10px rgba(0, 240, 255, 0.6); }
+        .card.forum-btn:hover .macro-title { text-shadow: 0 0 10px rgba(138, 43, 226, 0.8); }
+        .card.news-btn:hover .macro-title { text-shadow: 0 0 10px rgba(255, 170, 0, 0.8); }
 
-        .card.forum-btn:hover .macro-title {
-            text-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
-        }
+        .macro-details { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+        /* Секция случайных элементов */
+        .random-section { margin-top: 60px; width: 100%; max-width: 1200px; }
+        .random-section h2 { font-size: 28px; font-weight: 300; margin-bottom: 30px; text-align: center; color: var(--text-main); }
+        .random-grid { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
         
-        .card.news-btn:hover .macro-title {
-            text-shadow: 0 0 10px rgba(255, 170, 0, 0.8);
+        .random-card {
+            flex: 1; min-width: 280px; background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px;
+            padding: 25px; text-align: left; transition: transform 0.2s ease;
         }
+        .random-card:hover { transform: translateY(-3px); border-color: rgba(255, 255, 255, 0.15); }
+        .random-type { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 600; }
+        .type-news { color: var(--neon-news); }
+        .type-forum { color: var(--neon-primary); }
+        .type-macro { color: var(--neon-cyan); }
+        .random-card h3 { font-size: 18px; margin-bottom: 12px; color: #fff; }
+        .random-card p { font-size: 14px; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        .macro-details {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        /* Адаптивность под мобилки */
         @media (max-width: 768px) {
-            header {
-                padding: 20px;
-                flex-direction: column;
-                gap: 15px;
-            }
-            .nav-actions {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 15px;
-            }
-            h1 {
-                font-size: 36px;
-            }
+            header { padding: 20px; flex-direction: column; gap: 15px; }
+            .nav-actions { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            h1 { font-size: 36px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Блокирующий экран (Оверлей) -->
+    <div id="captcha-overlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(5px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s;
+    ">
+        <div style="color: var(--neon-cyan); font-size: 18px; margin-bottom: 20px; text-shadow: 0 0 10px var(--neon-cyan);">
+            [!] ТЕРМИНАЛ ЗАБЛОКИРОВАН. ПРОЙДИТЕ ПРОВЕРКУ БЕЗОПАСНОСТИ
+        </div>
+        
+        <!-- Сама капча -->
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAD6qfRZS8TyAdN8iGM2yPx3A4b4" data-callback="onTurnstileSuccess"></div>
+    </div>
 
     <header>
         <a href="index.html" class="logo">MacroList</a>
@@ -296,12 +300,12 @@
             <a href="forum.html" class="nav-link">Обсуждение</a>
             <a href="news.html" class="nav-link">Новости</a>
             <a href="download.html" class="nav-link">Скачать xdBot</a>
+            <a href="https://www.newgrounds.com/audio" target="_blank" class="btn-newgrounds">🎵 Музыка NG</a>
             <a href="submit.html" class="btn-submit">Предложить макрос</a>
         </div>
     </header>
 
     <main>
-        
         <h1>Поиск макросов</h1>
         
         <div class="search-bar">
@@ -309,37 +313,115 @@
         </div>
 
         <div class="categories">
-            <!-- Кнопка 1: Каталог макросов (Голубой неон) -->
             <a href="catalog.html" class="card catalog-btn">
                 <div class="macro-info">
                     <div class="macro-title">Каталог макросов</div>
-                    <div class="macro-details">
-                        Полная база проверенных TAS и макросов, отсортированная по сложности и актуальным версиям игры.
-                    </div>
+                    <div class="macro-details">Полная база проверенных TAS и макросов, отсортированная по сложности и актуальным версиям игры.</div>
                 </div>
             </a>
-
-            <!-- Кнопка 2: Форум сообщества (Фиолетовый неон) -->
             <a href="forum.html" class="card forum-btn">
                 <div class="macro-info">
                     <div class="macro-title">Форум сообщества</div>
-                    <div class="macro-details">
-                        Живое общение с игроками, обсуждение механик, помощь по настройке ботов и трекер обновлений.
-                    </div>
+                    <div class="macro-details">Живое общение с игроками, обсуждение механик, помощь по настройке ботов и трекер обновлений.</div>
                 </div>
             </a>
-            
-            <!-- Кнопка 3: Новости проекта (Оранжевый неон) -->
             <a href="news.html" class="card news-btn">
                 <div class="macro-info">
                     <div class="macro-title">Новости проекта</div>
-                    <div class="macro-details">
-                        Последние обновления базы, анонсы новых функций и важные события нашего сообщества.
-                    </div>
+                    <div class="macro-details">Последние обновления базы, анонсы новых функций и важные события нашего сообщества.</div>
                 </div>
             </a>
         </div>
+
+        <div class="random-section">
+            <h2>Случайное из базы</h2>
+            <div class="random-grid" id="random-container">
+                <p style="color: var(--text-muted);">Ожидание верификации...</p>
+            </div>
+        </div>
     </main>
 
+    <script>
+        // Глобальная функция для капчи ДОЛЖНА БЫТЬ ОБЪЯВЛЕНА ДО ТОГО как Cloudflare её вызовет
+        let isHumanVerified = false;
+
+        function onTurnstileSuccess(token) {
+            isHumanVerified = true;
+            console.log("Доступ разрешен!");
+
+            const overlay = document.getElementById('captcha-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => { 
+                    overlay.style.display = 'none'; 
+                    // Начинаем загрузку контента только после успешного прохождения проверки
+                    loadRandomPicks();
+                }, 500);
+            }
+        }
+
+        const FORUM_API = "https://script.google.com/macros/s/AKfycbwF4B2WhBFPg52nJbkoMkEdQ8rOwXNQdfTZFBs-J4mp8T6UW-iKN3uqmRusfZ_xNTDHUw/exec";
+        const NEWS_API = "https://script.google.com/macros/s/AKfycbyEUOzz3qSGqZjPMSQPkWZY-kjJTOjD-xOLknxRxYaR0hszSI0HKLFu8rYoj1rUv-QM/exec";
+        const MACRO_API = "https://script.google.com/macros/s/AKfycbyXMklmFvIC0YHiOseyNcMWfoe8GA5fPeE1NsWEi5aFZxL9-xyB7zfGf37XIab1DeoO/exec";
+
+        async function fetchRandomItem(url, typeName) {
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.status === "success" && result.data && result.data.length > 0) {
+                    const randomEntry = result.data[Math.floor(Math.random() * result.data.length)];
+                    return {
+                        type: typeName,
+                        title: randomEntry.title || randomEntry.threadTitle || randomEntry.name || "Без заголовка",
+                        body: randomEntry.body || randomEntry.message || randomEntry.description || "Нет описания"
+                    };
+                }
+            } catch (e) {
+                console.error("Ошибка загрузки из скрипта: " + typeName);
+            }
+            return null;
+        }
+
+        async function loadRandomPicks() {
+            // Дополнительная проверка на случай прямого вызова
+            if (!isHumanVerified) return;
+
+            const container = document.getElementById('random-container');
+            container.innerHTML = '<p style="color: var(--text-muted);">Загрузка данных...</p>';
+
+            const [newsItem, forumItem, macroItem] = await Promise.all([
+                fetchRandomItem(NEWS_API, "Новость"),
+                fetchRandomItem(FORUM_API, "Форум"),
+                fetchRandomItem(MACRO_API, "Макрос")
+            ]);
+
+            container.innerHTML = "";
+            const itemsToRender = [newsItem, forumItem, macroItem];
+            let hasData = false;
+
+            itemsToRender.forEach(item => {
+                if (item) {
+                    hasData = true;
+                    let typeClass = "";
+                    if (item.type === "Новость") typeClass = "type-news";
+                    if (item.type === "Форум") typeClass = "type-forum";
+                    if (item.type === "Макрос") typeClass = "type-macro";
+
+                    container.innerHTML += `
+                        <div class="random-card">
+                            <div class="random-type ${typeClass}">${item.type}</div>
+                            <h3>${item.title}</h3>
+                            <p>${item.body}</p>
+                        </div>
+                    `;
+                }
+            });
+
+            if (!hasData) {
+                container.innerHTML = "<p style='color: var(--text-muted);'>Базы данных пока пусты.</p>";
+            }
+        }
+    </script>
 </body>
 </html>
